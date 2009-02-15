@@ -1,16 +1,18 @@
+/**
+ *candriver.c
+ *2-15-09
+ *jrm
+ *Receive a command(com), a pointer to array of chars(*message_array[])
+ *and a pointer to a message id(*msg_id).
+ *return 0=success, 1=can down, 2=buffer error, 3=can errors, 4=buffer empty, 5=
+ *6=can busy, 7=invalid command arg
+ *command summary:0=initialize, 1=receive, 2=send, 3=filter management(unfinished)
+ */
 #include<stdio.h>
 #include<sys/ioctl.h>
 #include<../include/can.h>
 
 int Driver(unsigned char com, char *message_array[], unsigned long *msg_id)
-	/**
-	 *Receive a command(com), a pointer to array of chars(*message_array[])
-	 *and a pointer to a message id(*msg_id).
-	 *return 0=success, 1=can down, 2=buffer error, 3=can errors, 4=buffer empty, 5=
-	 *6=can busy, 7=invalid command arg
-	 *command summary:0=initialize, 1=receive, 2=send, 3=filter management(unfinished)
-	 */
-
 {
 	int fd=0, ret=0, i=0;
 	char specialfile[]="/dev/can0";

@@ -1,0 +1,71 @@
+#include<intarb.h>
+
+int Master(struct cnt_template_t *local, struct cnt_template_t ui)
+{
+	int ret=0 int i=0 int ii=0;
+	static int ui_flag;
+	char m_message_array[5];
+	unsigned long m_msg_id;
+	struct cnt_template_t m_ui;
+
+	/*contingency bit check*/
+	if (local->function & 0xFFFE == 0xFFFF) {
+		m_msg_id = 3;
+		m_message_array[] = 0;
+		ret = Driver(2, &m_message_array[], &m_msg_id);
+		if (ret != 0) {
+			return -1;
+		} else {
+			control.function = 1;
+			return 0;
+		}
+	}
+
+	/*local ui retrieval*/
+	if (ui_flag == 1) {
+		ControlUpdate(ui);
+	do {
+		ret = Driver(1, &m_message_array[], &m_msg_id);
+		switch (m_msg_id) {
+			case 0: //master ping
+				m_msg_id = 7;
+				m_message_array[] = 0;
+				ret = Driver(2, &m_message_array[], &m_msg_id);
+				break;
+
+			case 3: //contingency broadcast
+				m_msg_id = 3;
+				m_message_array[] = 0;
+				ret = Driver(2, &m_message_array[], &m_msg_id);
+				if (ret != 0) {
+					return -1;
+				} else {
+					control.function = 1;
+				}
+				return 0;
+
+			case 5: //status response
+				for (i=0; ii==1; i++) { // calculate array offset by jack address
+					if (jack_lookup(i) == m_message_array[0])
+						ii = 1;
+				} //FIXME add nonexistent address handler
+				status_table[i].function = m_message_array[1];
+				status_table[i].elevation = m_message_array[2];
+				status_table[i].elevation = ((status_table[i].elevation << 8) + m_message_array[3]);
+				status_table[i].pressure = m_message_array[4];
+				status_table[i].pressure = ((status_table[i].pressure << 8) + m_message_array[5]);
+				break;
+
+			case 6: //remote ui retrieval
+				
+				
+		}
+	}
+	while (ret != 4);
+		ret = Driver(1, &m_message_array[], &m_msg_id);
+		if (ret != 0) {
+			return -1;
+		} else {
+			
+		if (m_ui.function & 0xFFF7 == 0xFFFF) {
+		
