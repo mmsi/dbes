@@ -1,5 +1,5 @@
 /**
- *intarb.h
+ *int_arb/intarb.h
  *2-16-09
  *jrm
  *header file for Interface/Arbitor segment
@@ -29,7 +29,7 @@ extern struct status status_table[MAX_ADDRESSABLE];
 
 /*jack addressing*/
 extern int active;
-extern int jack_lookup_table[active]; //FIXME is this legal?
+extern int jack_lookup_table[]; //FIXME is this legal?
 
 /*local ui 1=local, 0=remote*/
 extern int ui_flag;

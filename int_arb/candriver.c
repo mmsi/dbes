@@ -1,5 +1,5 @@
 /**
- *candriver.c
+ *int_arb/candriver.c
  *2-15-09
  *jrm
  *Receive a command(com), a pointer to array of chars(*message_array[])

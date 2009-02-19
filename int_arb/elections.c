@@ -1,5 +1,5 @@
 /**
- *elections.c
+ *int_arb/elections.c
  *2-16-09
  *jrm
  *elect a master in concert with other jacks on the net
