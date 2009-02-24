@@ -13,7 +13,7 @@
 char m_message_array[MSG_LENGTH];
 unsigned long m_msg_id;
 
-int Master(struct cnt_template_t *local, struct cnt_template_t ui)
+int Master(struct cnt_template_t *local)
 {
 	int ret=0, i=0, ii=0, cnt_update;
 	
@@ -102,9 +102,9 @@ int Master(struct cnt_template_t *local, struct cnt_template_t ui)
 	}
 }
 
-int ControlUpdate(struct cnt_template_t *ui)
+int ControlUpdate(struct cnt_template_t *l_ui)
 {
-	control = *ui;
+	control = *l_ui;
 	return;
 }
 

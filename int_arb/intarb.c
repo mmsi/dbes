@@ -1,5 +1,5 @@
 /**
- *intarb.c
+ *dbes/int_arb/intarb.c
  *2-17-09
  *jrm
  *Interface/Arbitor main operations
@@ -7,7 +7,7 @@
  
 #include<intarb.h>
 
-int Arbitor()
+int Arbitor(struct status_t local_status, struct cnt_template_t *)
 {
 	int ret;
 	static int h_status;
@@ -32,7 +32,7 @@ int Arbitor()
 		printf("hit the 'any' key if this is the operator...");
 		pause(5);
 		ret = getchar();
-		if (ret == 0) { //FIXME
+		if (ret == 0) { //FIXME why?
 			ui_flag = 0;
 		} else {
 			ui_flag = 1;
@@ -40,11 +40,12 @@ int Arbitor()
 		ini_flag = 1;
 	}
 	
+	//FIXME parse status into array
 	/*normal int/arb operations*/
 	if (ui_flag == 1)
 		UI();
 	
 	if (h_status == 1) {
-		ret = Master(&local, ui);
+		ret = Master(&local, ui); //FIXME what a mess!
 		if (ret < 0)
 			
