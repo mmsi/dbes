@@ -7,13 +7,14 @@
  
 #include<intarb.h>
 
-int Arbitor(struct status_t local_status, struct cnt_template_t *)
+int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 {
 	int ret;
 	static int h_status;
 	
-	printf("Initializing network...  ")
+	
 	if (ini_flag == 0) {
+		printf("Initializing network...  ")
 		ret = Elections();
 		if (ret = 0) {
 			printf("FAILURE!!!\nactive jacks detected: %i\n", active);
@@ -32,7 +33,7 @@ int Arbitor(struct status_t local_status, struct cnt_template_t *)
 		printf("hit the 'any' key if this is the operator...");
 		pause(5);
 		ret = getchar();
-		if (ret == 0) { //FIXME why?
+		if (ret == 0) { //FIXME why? oh.
 			ui_flag = 0;
 		} else {
 			ui_flag = 1;
@@ -40,12 +41,35 @@ int Arbitor(struct status_t local_status, struct cnt_template_t *)
 		ini_flag = 1;
 	}
 	
-	//FIXME parse status into array
-	/*normal int/arb operations*/
-	if (ui_flag == 1)
-		UI();
+	/*push local jack status to array*/
+	status_table[0] = local_status;
 	
+	/*normal int/arb operations*/
+	if (ui_flag == 1) {
+		
+		UI();
+	}
+	
+	/*master*/
 	if (h_status == 1) {
-		ret = Master(&local, ui); //FIXME what a mess!
-		if (ret < 0)
-			
+		ret = Master(local);
+		if (ret < 0) {
+			printf("master routine error, calling contingency.");
+			return -1;
+		}
+		
+	/*slave*/
+	} else if (h_status == 0) {
+		ret = Slave(local);
+		if (ret < 0) {
+			printf("slave routine error, calling contingency.");
+			return -1;
+		}
+		
+	} else {
+		printf("h_status variable out of bounds, please panic.");
+		return 0; //returning normal, should this condition cause cont?
+	}
+	
+	return 0;
+}

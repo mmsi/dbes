@@ -42,13 +42,13 @@ int Master(struct cnt_template_t *local)
 		if (ret != 0)
 			return -1;
 		switch (m_msg_id) {
-			case 0: //master ping
+			case MASTER_PING: //master ping
 				m_msg_id = 7;
 				m_message_array[0] = 0;
 				ret = Driver(2, &m_message_array[0], &m_msg_id);
 				break;
 
-			case 3: //contingency broadcast
+			case CONT: //contingency broadcast
 				/*
 				 *is a contingency re-broadcast necessary?
 				 */
@@ -61,8 +61,8 @@ int Master(struct cnt_template_t *local)
 					control.function = 1;
 				}
 				return 0;
-
-			case 5: //status response
+			//FIXME add status request hanlder
+			case STATUS: //status response
 				for (i=0; ii==1; i++) { // calculate array offset by jack address
 					if (jack_lookup_table[i] == m_message_array[0])
 						ii = 1;
@@ -74,7 +74,7 @@ int Master(struct cnt_template_t *local)
 				status_table[i].pressure = ((status_table[i].pressure << 8) + m_message_array[5]);
 				break;
 
-			case 6: //remote ui retrieval
+			case UIPASS: //remote ui retrieval
 				m_ui.function = m_message_array[0];
 				m_ui.function = ((m_ui.function << 8) + m_message_array[1]);
 				m_ui.dest = m_message_array[2];

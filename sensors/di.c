@@ -1,9 +1,12 @@
-/**
- *dbes/control_str.h
- *origin 2-24-09
- *modified 2-26-09
- *jrm<jrcowboy79@gmail.com>
+/***************************************************************************
+ *            dbes/sensors/di.c
  *
+ *  Thu Feb 26 11:51:20 2009
+ *  Copyright  2009  Joel Morgan
+ *  <jrcowboy79@gmail.com>
+ ****************************************************************************/
+
+/*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -17,21 +20,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
- *//
+ */
  
-/*main control structure type*/
-struct cnt_template_t {
-	unsigned short function; //FIXME consider splitting address out to simplify parsing
-	unsigned short dest;
-	unsigned char rate;
-};
+#include"sensor_struct.h"
 
-/*individual jack status type*/
-struct status_t {
-	unsigned char function;
-	unsigned short elevation;
-	unsigned short pressure;
-};
-
-/*global fd for mmap to use*/
-extern int devmem;
+int di(pin)
+{
+	int init;
+	static unsigned int *ddr, *dr;
+	static unsigned char *start;

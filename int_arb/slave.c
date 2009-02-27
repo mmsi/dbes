@@ -8,14 +8,14 @@
 #include<intarb.h>
 #include<candriver.h>
 
-int Slave(struct status *local, struct cnt_template_t ui)
+int Slave(struct cnt_template_t *local)
 {
 	int ret
 	char s_message_array[MSG_LENGTH];
 	unsigned long s_msg_id;
 
 	/*contingency bit check*/
-	if (local->function | 0xFFFE == 0xFFFF) {
+	if (local->function | 0xFFFE == 0xFFFF) { //FIXME local status is in array now
 		s_msg_id = 3;
 		s_message_array[] = 0;
 		ret = Driver(TX, &s_message_array[], &s_msg_id);
@@ -33,7 +33,7 @@ int Slave(struct status *local, struct cnt_template_t ui)
 			if (ret != 0)
 				return -1;
 			switch (s_msg_id) {
-				case 1:
+				case CONTROL:
 					control.function = s_message_array[0];
 					control.function = ((control.function << 8) + s_message_array[1]);
 					control.dest = s_message_array[2];
@@ -41,7 +41,7 @@ int Slave(struct status *local, struct cnt_template_t ui)
 					control.rate = s_message_array[4];
 					break;
 
-				case 4:
+				case STATUS_REQ: //FIXME rewrite, local status is now in array [0]
 					s_message_array[0] = UNIQ_ID;
 					s_message_array[1] = local->function;
 					s_message_array[2] = (local->elevation >> 8);

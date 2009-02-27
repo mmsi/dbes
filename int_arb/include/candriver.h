@@ -28,3 +28,5 @@
 #define STATUS 5	   //6 bytes - note exception
 #define UIPASS 6	   //5 bytes
 #define PING_REPLY 7   //no data
+
+int Driver(unsigned char, char *, unsigned long *)

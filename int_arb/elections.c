@@ -15,6 +15,7 @@ int JackDatabase()
 
 char e_message_array[MSG_LENGTH];
 unsigned long e_msg_id;
+char active_table[];
 
 /*return: 0=error, 1=slave, 2=master*/
 int Elections()
@@ -33,11 +34,11 @@ int Elections()
 	
 	/*elect master*/
 	do {
-		if (UNIQ_ID < active_table[i] {
-			return 1; //slave
+		if (UNIQ_ID < jack_lookup_table[i] {
+			return 1; //slave FIXME slave with local ui still needs to know th # of jacks (active)
 		}
 		i++;
-	} while(active_table[i] != 0);
+	} while(jack_lookup_table[i] != 0);
 	active = i; //extern number of active jacks
 	return 2; //master
 
@@ -47,7 +48,7 @@ int JackDatabase() {
 	e_message_array[0] = UNIQ_ID;
 	e_msg_id = BROAD_ID;
 	ret = Driver(TX, &e_message_array[], &e_msg_id);
-	if (ret != 0
+	if (ret != 0)
 		return 0;
 
 	do {
@@ -61,12 +62,12 @@ int JackDatabase() {
 			case 2: //build database of jacks on net
 				i = 0;
 				do {
-					if (e_message_array[0] == active_table[i]) {
-						break;
+					if (e_message_array[0] == jack_lookup_table[i]) {
+						break; //FIXME can i break out this deeply nested?
 					}
 					i++;
-				} while(active_table[i] != 0);
-				active_table[i] = e_message_array[0];
+				} while(jack_lookup_table[i] != 0);
+				jack_lookup_table[i] = e_message_array[0];
 		} while(e_message_array[] != 0);
 	return;
 	}
