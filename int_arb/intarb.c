@@ -5,6 +5,7 @@
  *Interface/Arbitor main operations
  */
  
+#include<stdio.h>
 #include<intarb.h>
 
 int Arbitor(struct status_t local_status, struct cnt_template_t *local)
@@ -14,12 +15,12 @@ int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 	
 	
 	if (ini_flag == 0) {
-		printf("Initializing network...  ")
+		printf("Initializing network...  ");
 		ret = Elections();
 		if (ret = 0) {
 			printf("FAILURE!!!\nactive jacks detected: %i\n", active);
 			printf("check connections and restart system\n\n");
-			exit();
+			exit(); //FIXME warning
 		} else if (ret = 1) {
 			printf("this jack is a slave\n");
 		} else if (ret = 2) {
@@ -32,7 +33,7 @@ int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 		/*probe for ui*/
 		printf("hit the 'any' key if this is the operator...");
 		pause(5);
-		ret = getchar();
+		ret = getchar(); //FIXME this is blocking
 		if (ret == 0) { //FIXME why? oh.
 			ui_flag = 0;
 		} else {

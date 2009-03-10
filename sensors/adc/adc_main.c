@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
- *//
+ */
  
 #include<stdio.h>
 #include"peekpoke_dbes.h"
@@ -26,7 +26,7 @@
 
 static unsigned long adc_page, syscon_page;
 
-int adc(int channel, int *result)
+int ADC(unsigned short channel, int *result)
 {
 	static int init = 0;
 	int i, adc_result[5];
@@ -49,6 +49,7 @@ int adc(int channel, int *result)
 		}
 		
 		init_ADC(adc_page, syscon_page);
+		return 0;
 	}
 	
 	/*read adc channel*/

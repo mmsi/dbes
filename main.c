@@ -1,7 +1,7 @@
 /***************************************************************************
- *            dbes/sensors/di.c
+ *            dbes/main.c
  *
- *  Thu Feb 26 11:51:20 2009
+ *  Mon Mar  9 10:00:59 2009
  *  Copyright  2009  Joel Morgan
  *  <jrcowboy79@gmail.com>
  ****************************************************************************/
@@ -22,34 +22,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
  
-#include"sensor_struct.h"
+#include<control_str.h>
 
-#define DIO_PAGE 0x80840000
-
-/**
- *caller needs to initialize by using the '0' arg
- *else all other values revert to reading hard-coded pin # for now
- *port F, pin 0
- */
-int DI(pin)
+int Main()
 {
-	int init;
-	static unsigned int *pfddr, *pfdr, *gpiofdb;
-	static unsigned char *start;
+	int i;
 	
-	if (pin == 0) {
-		start = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
-					 devmem, DIO_PAGE);
-		//FIXME add mmap error handler
-		/*offsets*/
-		pfddr = (unsigned int *)(start + 0x34);
-		pfdr = (unsigned int *)(start + 0x30);
-		gpiofdb = (unsigned int *)(start + 0x64);
-		
-		*gpiofdb = (*gpiofdb & 0x1);
-		//pfddr defaults to inputs
-		return 0;
-	}
+	devmem = open("dev/mem", O_RDWR|O_SYNC);
 	
-	return (*pfdr & 0x1); //FIXME can 'return' use an expression?
 }

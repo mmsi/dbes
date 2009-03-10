@@ -19,28 +19,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
  
-/**
- *cnt_template_t
- *unsigned short function		address and/or other information
- *		bit 0					contingency flag
- *		bits 1,2				lift - 00: idle, 01: lift, 10: lower
- *		bits 3-6				undefined
- *		bit 7					init flag
- *		byte 1					jack id
- *unsigned short dest			destination height
- *unsigned char rate			lifting rate - raw linear 0-255
- */
-
 /*main control structure type*/
 struct cnt_template_t {
 	unsigned short function; //FIXME consider splitting address out to simplify parsing
 	unsigned short dest;
 	unsigned char rate;
 };
-
-/**
- *status_t
- *
 
 /*individual jack status type*/
 struct status_t {

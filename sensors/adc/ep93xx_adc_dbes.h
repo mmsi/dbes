@@ -2,7 +2,7 @@
  *ep93xx_adc_dbes.h
  *modified 2-26-09
  *jrm<jrcowboy79@gmail.com>
- *//
+ */
 
 #define ADC_PAGE          0x80900000
 #define ADCRESULT_OFFSET  0x0008
@@ -13,8 +13,10 @@
 #define ADC_CH0           0x0608
 #define ADC_CH1           0x0680
 #define ADC_CH2           0x0640
+#define PR_TRANS		  0x0640
 #define ADC_CH3           0x0620
 #define ADC_CH4           0x0610
+#define CET				  0x0610
 #define ADCSWLOCK_OFFSET  0x0020
 #define UNLOCK_VAL        0xAA
 

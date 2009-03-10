@@ -1,7 +1,7 @@
 /***************************************************************************
- *            dbes/sensors/di.c
+ *            hyd_control.c
  *
- *  Thu Feb 26 11:51:20 2009
+ *  Mon Mar  9 10:43:41 2009
  *  Copyright  2009  Joel Morgan
  *  <jrcowboy79@gmail.com>
  ****************************************************************************/
@@ -22,34 +22,46 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
  
-#include"sensor_struct.h"
+#include<control.h>
+#include<control_str.h>
 
-#define DIO_PAGE 0x80840000
-
-/**
- *caller needs to initialize by using the '0' arg
- *else all other values revert to reading hard-coded pin # for now
- *port F, pin 0
- */
-int DI(pin)
+int Hyd_Control(struct cnt_template_t control)
 {
-	int init;
-	static unsigned int *pfddr, *pfdr, *gpiofdb;
-	static unsigned char *start;
-	
-	if (pin == 0) {
-		start = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
-					 devmem, DIO_PAGE);
-		//FIXME add mmap error handler
-		/*offsets*/
-		pfddr = (unsigned int *)(start + 0x34);
-		pfdr = (unsigned int *)(start + 0x30);
-		gpiofdb = (unsigned int *)(start + 0x64);
-		
-		*gpiofdb = (*gpiofdb & 0x1);
-		//pfddr defaults to inputs
+	/*init handler*/
+	if ((control.function & 0x0080) == 1) {
+		Dout(0, 0);
+		PWM(0, 0);
 		return 0;
 	}
 	
-	return (*pfdr & 0x1); //FIXME can 'return' use an expression?
+	/*contingency handler*/
+	if ((control.function & 0x0001) == 1) {
+		Dout(MASTER, OFF);
+		Dout(CHECK, OFF);
+		PWM(0, 1);
+		Dout(LIGHT, ON);
+		return 0;
+	}
+	
+	switch (control.function & 0x0006) {
+		case 0:
+			Dout(MASTER, OFF);
+			Dout(CHECK, OFF);
+			PWM(0, 1);
+			break;
+			
+		case 2: //lift
+			Dout(MASTER, ON);
+			Dout(CHECK, OFF);
+			Dout(LIFT, ON);
+			PWM(control.rate, 2): //FIXME implement dither here
+			break;
+			
+		case 4: //lower
+			Dout(MASTER, ON);
+			Dout(CHECK, ON);
+			Dout(LIFT, OFF);
+			PWM(control.rate, 2);
+	}
+	return 0;
 }

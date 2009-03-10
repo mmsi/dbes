@@ -2,13 +2,13 @@
  *int_arb/candriver.h
  *2-15-09
  *jrm
- *definitions for functions interating with Driver()
+ *definitions for functions interacting with Driver()
  *Byte 0: jack address
  *Byte 1: function - bit 0 contingency bit, bits 1,2 lift status
  *Bytes 2,3: 16 bit elevation
  *Byte 4: rate
  *exception - status frames(id 5) bytes 4,5: 16bits pressure 
- *//
+ */
 
 /*driver control defines*/
 #define INI 0
