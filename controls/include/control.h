@@ -1,7 +1,7 @@
 /***************************************************************************
- *            dbes/sensors/di.c
+ *            dbes/hyd_control/control.h
  *
- *  Thu Feb 26 11:51:20 2009
+ *  Fri Feb 27 17:18:55 2009
  *  Copyright  2009  Joel Morgan
  *  <jrcowboy79@gmail.com>
  ****************************************************************************/
@@ -22,34 +22,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
  
-//#include"sensor_struct.h"
+/*digital output defines*/
+#define ON 1 
+#define OFF 0
 
-#define DIO_PAGE 0x80840000
-
-/**
- *caller needs to initialize by using the '0' arg
- *else all other values revert to reading hard-coded pin # for now
- *port F, pin 0
- */
-int DI(pin)
-{
-	int init;
-	static unsigned int *pfddr, *pfdr, *gpiofdb;
-	static unsigned char *start;
-	
-	if (pin == 0) {
-		start = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
-					 devmem, DIO_PAGE);
-		//FIXME add mmap error handler
-		/*offsets*/
-		pfddr = (unsigned int *)(start + 0x34);
-		pfdr = (unsigned int *)(start + 0x30);
-		gpiofdb = (unsigned int *)(start + 0x64);
-		
-		*gpiofdb = (*gpiofdb & 0x1);
-		//pfddr defaults to inputs
-		return 0;
-	}
-	
-	return (*pfdr & 0x1); //FIXME can 'return' use an expression?
-}
+/*pin assignments*/
+/*powers of 2 for bitwise manipulation*/
+#define LIFT 1	  //DIO_0 proportional valve select. off=lower, on=lift
+#define CHECK 2	  //DIO_1 cylinder check valve
+#define MASTER 4  //DIO_2 master control valve
+#define LIGHT 8   //DIO_3 contingency light

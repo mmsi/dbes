@@ -22,9 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
  
-#include"control_str.h"
 //#include"sens_struct.h"
 #include<stdio.h>
+#include"../include/control_str.h"
 
 #define PR_TRANS	0x0640
 #define CET			0x0610

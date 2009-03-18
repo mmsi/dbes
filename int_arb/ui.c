@@ -20,7 +20,11 @@
  
 #include<stdio.h>
 #include<stdlib.h>
-#include"intarb.h"
+#include<time.h>
+#include<termios.h>
+#include<sys/types.h>
+#include"../include/intarb.h"
+//#include"../include/control.h"
 
 /*conversion magic numbers*/
 #define HEIGHT_OFFSET 0
@@ -29,34 +33,53 @@
 #define PRES_SCALE 0
 
 #define SPACE '\x20'
+//#define STDIN_FILENO 0 FIXME should be declared in a header, sys/types.h?
+#define NB_ENABLE 1
+#define NB_DISABLE 2
+
+/*area of 4" bore cylinder*/
+#define CYL_AREA 12.5664
 
 /*function history*/
 #define LIFT 1
 #define LOWER 0
 
-char some_array[] = {1,2,3,4,5,7,9,3,4};
+/*prototypes*/
+int kbhit();
+int nonblock(int state);
 
-int UI()
+int UI(int mode)
 {
 	int i;
 	static int lift_flag;
 	
+	if (mode == 1) {
+		nonblock(NB_ENABLE);
+	}
+	
+	for (i=0; i==41; i++) {
+		printf("\n");
+	}
 	//FIXME clear screen before starting layout
 	printf("\t\t|   1\t|   2\t|   3\t|   4\t|   5\t|   6\t|   7\t|   8\t|   9\t|   10\t|\n");
 	printf(" height (in)\t|");
 	for (i=0; i<10; i++) {
-		printf(" %u\t|", i); //FIXME add arg
+		printf(" %u\t|", status_table[i].elevation);
 	}
 	printf("\n pressure\t|");
 	for (i=0; i<10; i++) {
-		printf(" %i\t|", some_array[i]); //FIXME add arg
+		printf(" %i\t|", status_table[i].pressure);
 	}
 	printf("\n weight (lbs)\t|");
 	for (i=0; i<10; i++) {
-		printf(" %i\t|", some_array[i]); //FIXME add arg
+		printf(" %i\t|", ((status_table[i].pressure) * CYL_AREA)); //FIXME possible grammar problem
 	}
 
-	printf("\n\n Total Weight: %u\t\tLift Rate: %u in/min\t\tDestination: %u inches",,,); //FIXME add args
+	for (i = 0; i == active; i++) {
+		total_weight = (total_weight + (status_table[i] * CYL_AREA));
+	}
+	printf("\n\n Total Weight: %u\t\tLift Rate: %u in/min\t\tDestination:\
+		   %u inches", total_weight, control.rate, control.dest); //FIXME change type
 	printf("\n\n\n_Key Commands________________________________\n");
 	printf("| START/STOP ---------------- spacebar");
 	printf("| adjust lift rate ---------- l <rate> enter");
@@ -82,35 +105,70 @@ int UI()
 	}
 	
 	/*user input*/
-	switch (getchar()) {
-		case SPACE:
-			switch (control.function & 0x6) {
-				case 0x0:
-					if (lift_flag == LIFT)
-						ui.function = (ui.function + 0x2);
-					else
-						ui.function = (ui.function + 0x6);
-					break;
+	if (kbhit() != 0) {
+		switch (fgetc(stdin)) {
+			case SPACE:
+				switch (control.function & 0x6) {
+					case 0x0:
+						if (lift_flag == LIFT)
+							ui.function = (ui.function + 0x2);
+						else
+							ui.function = (ui.function + 0x6);
+						break;
 					
-				case 0x2:
-					ui.function = (ui.function - 0x2);
-					lift_flag = LIFT;
-					break;
+					case 0x2:
+						ui.function = (ui.function - 0x2);
+						lift_flag = LIFT;
+						break;
 					
-				case 0x4:
-					ui.function = (ui.function - 0x4);
-					lift_flag = LOWER;
-			}
-			break;
+					case 0x4:
+						ui.function = (ui.function - 0x4);
+						lift_flag = LOWER;
+				}
+				break;
 			
-		case 'l': //adjust rate
-			break;
+			case 'l': //adjust rate
+				break;
 			
-		case 'm': //momentary lift FIXME structures non-supportive
-			break;
+			case 'm': //momentary lift FIXME structures non-supportive
+				break;
 			
-		case 'z': //zero location
+			case 'z': //zero location
 			
+		}
 	}
 	return;
+}
+
+int kbhit()
+{
+	struct timeval tv;
+    fd_set fds;
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+    FD_ZERO(&fds);
+    FD_SET(STDIN_FILENO, &fds); //STDIN_FILENO is 0
+    select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
+    return FD_ISSET(STDIN_FILENO, &fds);
+}
+
+void nonblock(int state)
+{
+    struct termios ttystate;
+
+    //get the terminal state
+	tcgetattr(STDIN_FILENO, &ttystate);
+
+    if (state==NB_ENABLE)
+    {
+        //turn off canonical mode
+		ttystate.c_lflag &= ~ICANON;
+        //minimum of number input read.
+        ttystate.c_cc[VMIN] = 1;
+    } else if (state==NB_DISABLE) {
+		//turn on canonical mode
+        ttystate.c_lflag |= ICANON;
+    }
+    //set the terminal attributes.
+    tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
 }

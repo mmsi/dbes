@@ -24,8 +24,8 @@
  
 #include<stdio.h>
 #include<sys/mman.h>
-#include"control.h"
-#include"control_str.h"
+#include"../include/control.h"
+#include"../include/control_str.h"
 
 #define DIO_PAGE 0x80840000
 

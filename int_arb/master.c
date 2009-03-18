@@ -5,8 +5,8 @@
  * if elected 'master', this routine runs to glue the ui(remote or local) to
  * other jacks
  */ 
-#include"intarb.h"
-#include"candriver.h"
+#include"../include/intarb.h"
+#include"../include/candriver.h"
 
 #define MAXSTAT 20
 

@@ -22,8 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
  
-#include<control.h>
-#include<control_str.h>
+#include<../include/control.h>
+#include<../include/control_str.h>
 
 int Hyd_Control(struct cnt_template_t control)
 {

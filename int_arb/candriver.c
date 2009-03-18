@@ -10,7 +10,7 @@
  */
 #include<stdio.h>
 #include<sys/ioctl.h>
-#include<../include/can.h>
+#include"../include/can.h"//FIXME need to get this header somehow
 
 int Driver(unsigned char com, char *message_array[], unsigned long *msg_id)
 {

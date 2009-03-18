@@ -6,7 +6,7 @@
  */
  
 #include<stdio.h>
-#include<intarb.h>
+#include"../include/intarb.h"
 
 int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 {
@@ -20,13 +20,13 @@ int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 		if (ret = 0) {
 			printf("FAILURE!!!\nactive jacks detected: %i\n", active);
 			printf("check connections and restart system\n\n");
-			exit(); //FIXME warning
+			exit(); //FIXME warning from compiler
 		} else if (ret = 1) {
 			printf("this jack is a slave\n");
 		} else if (ret = 2) {
 			printf("this jack is the master\n");
 		} else
-			return 0;
+			return 0; //FIXME not fault tolerant?
 		printf("active jacks on system: %i\n", (active+2));
 		h_status = ret;
 		
@@ -43,7 +43,7 @@ int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 	}
 	
 	/*push local jack status to array*/
-	status_table[0] = local_status;
+	status_table[0] = local_status; //FIXME this should occur before elections
 	
 	/*normal int/arb operations*/
 	if (ui_flag == 1) {

@@ -5,8 +5,8 @@
  *
  */
 
-#include<intarb.h>
-#include<candriver.h>
+#include"../include/intarb.h"
+#include"../include/candriver.h"
 
 int Slave(struct cnt_template_t *local)
 {
