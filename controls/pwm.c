@@ -23,6 +23,8 @@
  */
  
 #include<stdio.h>
+#include<sys/mman.h>
+#include"../include/control_str.h"
 
 #define XDIO_PAGE 0x12C00000
 #define REG_0 0
@@ -65,7 +67,7 @@ int PWM(unsigned char rate, int mode)
 			/*set rate*/
 			rate_s = ((unsigned short)rate * 16);
 			*pwm_high_lsb = (rate_s & 0xFF);
-			*pwm_msbs = (((rate_s & 0xF00) >> 4)+(((0xFFF - rate_s)
+			*pwm_msbs = (((rate_s & 0xF00) >> 4)+(((0xFFF - rate_s)\
 												   & 0xF00) >> 8));
 			*pwm_low_lsb = ((0xFFF - rate_s) & 0xFF);
 

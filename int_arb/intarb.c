@@ -6,7 +6,10 @@
  */
  
 #include<stdio.h>
-#include"../include/intarb.h"
+#include"include/intarb.h"
+
+#define INIT 1
+#define NORM 0
 
 int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 {
@@ -20,7 +23,7 @@ int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 		if (ret = 0) {
 			printf("FAILURE!!!\nactive jacks detected: %i\n", active);
 			printf("check connections and restart system\n\n");
-			exit(); //FIXME warning from compiler
+			//exit(); //FIXME warning from compiler
 		} else if (ret = 1) {
 			printf("this jack is a slave\n");
 		} else if (ret = 2) {
@@ -34,21 +37,23 @@ int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 		printf("hit the 'any' key if this is the operator...");
 		pause(5);
 		ret = getchar(); //FIXME this is blocking
-		if (ret == 0) { //FIXME why? oh.
+		if (ret == 0) { //not ui
 			ui_flag = 0;
-		} else {
+		} else { //char received, ui local
 			ui_flag = 1;
+			UI(INIT);
 		}
 		ini_flag = 1;
+		return;
 	}
 	
 	/*push local jack status to array*/
-	status_table[0] = local_status; //FIXME this should occur before elections
+	status_table[0] = local_status;
 	
 	/*normal int/arb operations*/
 	if (ui_flag == 1) {
 		
-		UI();
+		UI(NORM);
 	}
 	
 	/*master*/

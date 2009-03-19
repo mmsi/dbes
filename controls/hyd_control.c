@@ -22,8 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
  
-#include<../include/control.h>
-#include<../include/control_str.h>
+#include"include/control.h"
+#include"../include/control_str.h"
 
 int Hyd_Control(struct cnt_template_t control)
 {
@@ -54,7 +54,7 @@ int Hyd_Control(struct cnt_template_t control)
 			Dout(MASTER, ON);
 			Dout(CHECK, OFF);
 			Dout(LIFT, ON);
-			PWM(control.rate, 2): //FIXME implement dither here
+			PWM(control.rate, 2); //FIXME implement dither here
 			break;
 			
 		case 4: //lower

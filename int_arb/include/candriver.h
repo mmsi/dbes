@@ -29,4 +29,4 @@
 #define UIPASS 6	   //5 bytes
 #define PING_REPLY 7   //no data
 
-int Driver(unsigned char, char *, unsigned long *)
+int Driver(unsigned char, char *, unsigned long *);

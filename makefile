@@ -3,12 +3,34 @@
 #updated 2-25-09
 #jrm
 
-dbes_alpha : intarb.o ui.o elections.o slave.o master.o candriver.o\
-			 adc.o di.o sensors.o\
-			 pwm.o do.o hydcontrol.o\
-			 mainloop.o main.o
+srcdir = .
+
+CC = gcc
+CFLAGS = -I$(srcdir)
+
+SUBDIRS = int_arb controls sensors
+
+OBJ1 = int_arb/intarb.o int_arb/ui.o int_arb/elections.o int_arb/slave.o\
+			 int_arb/master.o int_arb/candriver.o
+OBJ2 = sensors/adc.o sensors/di.o sensors/sensors.o
+OBJ3 = controls/pwm.o controls/do.o controls/hyd_control.o
+OBJ4 = main.o
+OBJS = $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4)
 			 
-intarb.o :  intarb.c intarb.h control_str.h unique.h
-			gcc -c intarb.c
-			
-elections.o :   elections.c intarb.h 
+dbes_alpha :	$(OBJ4) subdirs
+				$(CC) -o dbes_alpha $(OBJS)
+
+#cd subdir && $(MAKE)
+
+
+.PHONY: subdirs $(SUBDIRS)
+
+subdirs: $(SUBDIRS)
+
+$(SUBDIRS):
+		$(MAKE) -C $@
+
+
+				
+main.o :	main.c include/control_str.h
+			$(CC) -c main.c

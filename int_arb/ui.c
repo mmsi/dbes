@@ -23,8 +23,7 @@
 #include<time.h>
 #include<termios.h>
 #include<sys/types.h>
-#include"../include/intarb.h"
-//#include"../include/control.h"
+#include"include/intarb.h"
 
 /*conversion magic numbers*/
 #define HEIGHT_OFFSET 0
@@ -33,7 +32,7 @@
 #define PRES_SCALE 0
 
 #define SPACE '\x20'
-//#define STDIN_FILENO 0 FIXME should be declared in a header, sys/types.h?
+#define STDIN_FILENO 0 //FIXME should be declared in a header, sys/types.h?
 #define NB_ENABLE 1
 #define NB_DISABLE 2
 
@@ -46,15 +45,16 @@
 
 /*prototypes*/
 int kbhit();
-int nonblock(int state);
+void Nonblock(int);
 
 int UI(int mode)
 {
 	int i;
 	static int lift_flag;
+	double total_weight;
 	
 	if (mode == 1) {
-		nonblock(NB_ENABLE);
+		Nonblock(NB_ENABLE);
 	}
 	
 	for (i=0; i==41; i++) {
@@ -72,14 +72,14 @@ int UI(int mode)
 	}
 	printf("\n weight (lbs)\t|");
 	for (i=0; i<10; i++) {
-		printf(" %i\t|", ((status_table[i].pressure) * CYL_AREA)); //FIXME possible grammar problem
+		printf(" %f\t|", ((status_table[i].pressure) * CYL_AREA)); //FIXME possible grammar problem
 	}
 
 	for (i = 0; i == active; i++) {
-		total_weight = (total_weight + (status_table[i] * CYL_AREA));
+		total_weight = (total_weight + (status_table[i].pressure * CYL_AREA));
 	}
-	printf("\n\n Total Weight: %u\t\tLift Rate: %u in/min\t\tDestination:\
-		   %u inches", total_weight, control.rate, control.dest); //FIXME change type
+	printf("\n\n Total Weight: %f\t\tLift Rate: %u in/min\t\tDestination:\
+		   %u inches", total_weight, control.rate, control.dest); //FIXME truncate total weight to 0 decimal places
 	printf("\n\n\n_Key Commands________________________________\n");
 	printf("| START/STOP ---------------- spacebar");
 	printf("| adjust lift rate ---------- l <rate> enter");
@@ -134,7 +134,7 @@ int UI(int mode)
 				break;
 			
 			case 'z': //zero location
-			
+				break;
 		}
 	}
 	return;
@@ -143,16 +143,16 @@ int UI(int mode)
 int kbhit()
 {
 	struct timeval tv;
-    fd_set fds;
-    tv.tv_sec = 0;
-    tv.tv_usec = 0;
-    FD_ZERO(&fds);
-    FD_SET(STDIN_FILENO, &fds); //STDIN_FILENO is 0
-    select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
-    return FD_ISSET(STDIN_FILENO, &fds);
+	fd_set fds;
+	tv.tv_sec = 0;
+	tv.tv_usec = 0;
+	FD_ZERO(&fds);
+	FD_SET(STDIN_FILENO, &fds); //STDIN_FILENO is 0
+	select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
+	return FD_ISSET(STDIN_FILENO, &fds);
 }
 
-void nonblock(int state)
+void Nonblock(int state)
 {
     struct termios ttystate;
 

@@ -23,25 +23,26 @@
  */
  
 #include<stdio.h>
-#include"../include/control_str.h"
+#include<fcntl.h>
+#include"include/control_str.h"
 
 /*prototypes*/
-int MainLoop()
-int Contingency()
+int MainLoop();
+int Contingency(void);
+
+struct status_t status;
+struct cnt_template_t local_control; //FIXME need better scope?
 
 int main()
 {
 	int i;
 	
-	struct status_t status;
-	struct cnt_template_t local_control; //FIXME need better scope?
-	
 	devmem = open("dev/mem", O_RDWR|O_SYNC);
 	
 	/*init all segments*/
 	Sensors(0);
-	control.function = 0x0080;
-	Hyd_Control(control);
+	local_control.function = 0x0080;
+	Hyd_Control(local_control);
 	Arbitor(status, &local_control);
 	
 	/*infinite loop unless fatal error*/
@@ -53,7 +54,7 @@ int main()
 	system("init 6");
 }
 
-MainLoop()
+int MainLoop()
 {
 	/*status_t status population*/
 	if (Sensors(1, &status) == 1) {
@@ -74,9 +75,11 @@ MainLoop()
 	return 0;
 }
 
-int Contingency()
+int Contingency(void)
 {
-	local_control = 0x0080;
+	int ret;
+	
+	local_control.function = 0x0080;
 	printf("entering contingency mode...\nplease correct problem");
 	printf(" and reset system\n"); //FIXME ui() should handle this and the reset
 	Hyd_Control(local_control);
@@ -84,8 +87,10 @@ int Contingency()
 	
 	/*reset handler*/
 	printf("press 'r' to reset: ");
-	ret = fgetc(stdin);
-	while (ret != 'r');
+	do {
+		ret = fgetc(stdin);
+	} while (ret != 'r');
 	printf("\n\nresuming normal mode...");
+	 
 	return;
 }

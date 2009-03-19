@@ -24,7 +24,7 @@
  
 #include<stdio.h>
 #include<sys/mman.h>
-#include"../include/control.h"
+#include"include/control.h"
 #include"../include/control_str.h"
 
 #define DIO_PAGE 0x80840000
@@ -36,7 +36,7 @@
 int Dout(int pin, int state)
 {
 	static unsigned int *pbdr, *pbddr;
-	static unsigned char *start; //FIXME i think your code is faulty
+	static unsigned char *start;
 	
 	/*initialization*/
 	if (pin == 0) {

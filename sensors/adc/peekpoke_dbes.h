@@ -2,7 +2,7 @@
  *peekpoke_dbes.h
  *modified 2-26-09
  *jrm<jrcowboy79@gmail.com>
- *//
+ */
 
 // We can't expect that a dereference of an unsigned short * always
 // produces a ldrh or strh since the compiler may choose to use

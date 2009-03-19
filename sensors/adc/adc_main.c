@@ -20,9 +20,11 @@
  */
  
 #include<stdio.h>
+#include<sys/mman.h>
 #include"peekpoke_dbes.h"
 //#include"eeprog_dbes.h"
 #include"ep93xx_adc_dbes.h"
+#include"../include/control_str.h"
 
 static unsigned long adc_page, syscon_page;
 
@@ -43,7 +45,7 @@ int ADC(unsigned short channel, int *result)
 			
 		syscon_page = (unsigned long)mmap(0, getpagesize(), PROT_READ|PROT_WRITE,
 				MAP_SHARED, devmem, SYSCON_PAGE);
-		if (&syscon_page == MAP_FAIED) {
+		if (&syscon_page == MAP_FAILED) {
 			printf("syscon_page mmaping failed");
 			return -1;
 		}

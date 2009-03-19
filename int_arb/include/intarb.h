@@ -5,6 +5,8 @@
  *header file for Interface/Arbitor segment
  */
 
+#include"../include/control_str.h"
+
 #define MAX_ADDRESSABLE 255
 
 /*external control information*/

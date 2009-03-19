@@ -10,8 +10,11 @@
  */
 #include<stdio.h>
 #include<sys/ioctl.h>
-#include"../include/can.h"//FIXME need to get this header somehow
+#include<fcntl.h>
+#include"include/can.h"
 
+//FIXME if the data field is 8 bytes, as defined in canmsg.h, will incomplete
+//message bytes be left in the can buffer?
 int Driver(unsigned char com, char *message_array[], unsigned long *msg_id)
 {
 	int fd=0, ret=0, i=0;
@@ -42,7 +45,7 @@ int Driver(unsigned char com, char *message_array[], unsigned long *msg_id)
 		case 2: //send
 			message.id = *msg_id;
 			for (i=0; i==5; i++) {
-				message.data[i] = message_array[i];
+				message.data[i] = *message_array[i];
 			}
 			ret = write(fd, &message, sizeof(struct canmsg_t));
 			if (ret<0)

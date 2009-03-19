@@ -23,6 +23,8 @@
  */
  
 //#include"sensor_struct.h"
+#include<sys/mman.h>
+#include"../include/control_str.h"
 
 #define DIO_PAGE 0x80840000
 

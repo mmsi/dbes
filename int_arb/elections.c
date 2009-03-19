@@ -6,12 +6,13 @@
  */
 
 #include<unistd.h>
-#include"../include/intarb.h"
-#include"../include/candriver.h"
+#include"include/intarb.h"
+#include"include/candriver.h"
+#include"../include/unique.h"
 
 #define PING_WAIT 2
 
-int JackDatabase()
+int JackDatabase();
 
 char e_message_array[MSG_LENGTH];
 unsigned long e_msg_id;
@@ -21,10 +22,11 @@ char active_table[];
 int Elections()
 {
 	int i = 0;
+	int ret;
 
 	/*check for existing master*/
 	e_msg_id = MASTER_PING;
-	ret = Driver(TX, &e_message_array[], &e_msg_id);
+	ret = Driver(TX, &e_message_array[0], &e_msg_id);
 	if (ret != 0)
 		return 0;
 	sleep(PING_WAIT);
@@ -34,25 +36,29 @@ int Elections()
 	
 	/*elect master*/
 	do {
-		if (UNIQ_ID < jack_lookup_table[i] {
+		if (UNIQ_ID < jack_lookup_table[i]) {
 			return 1; //slave FIXME slave with local ui still needs to know th # of jacks (active)
 		}
 		i++;
 	} while(jack_lookup_table[i] != 0);
 	active = i; //extern number of active jacks
 	return 2; //master
+}
 
-int JackDatabase() {
+int JackDatabase()
+{
 	int i;
+	int ret;
+	
 	/*broadcast id*/
 	e_message_array[0] = UNIQ_ID;
 	e_msg_id = BROAD_ID;
-	ret = Driver(TX, &e_message_array[], &e_msg_id);
+	ret = Driver(TX, &e_message_array[0], &e_msg_id);
 	if (ret != 0)
 		return 0;
 
 	do {
-		ret = Driver(RX, &e_message_array[], &e_msg_id);
+		ret = Driver(RX, &e_message_array[0], &e_msg_id);
 		if (ret != 0)
 			return 0;
 		switch (e_msg_id) {
@@ -68,6 +74,7 @@ int JackDatabase() {
 					i++;
 				} while(jack_lookup_table[i] != 0);
 				jack_lookup_table[i] = e_message_array[0];
-		} while(e_message_array[] != 0);
+		}	
+	} while(e_message_array[0] != 0);
 	return;
-	}
+}
