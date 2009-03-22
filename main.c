@@ -26,12 +26,16 @@
 #include<fcntl.h>
 #include"include/control_str.h"
 
+#define DIO_PAGE 0x80840000
+
 /*prototypes*/
 int MainLoop();
 int Contingency(void);
 
 struct status_t status;
 struct cnt_template_t local_control; //FIXME need better scope?
+int devmem;
+char *start;
 
 int main()
 {
@@ -40,18 +44,23 @@ int main()
 	devmem = open("dev/mem", O_RDWR|O_SYNC);
 	
 	/*init all segments*/
+	start = mmap(0, 4096, PROT_READ|PROT_WRITE, MAP_SHARED,
+				 devmem, DIO_PAGE);
+	printf("initializing sensors...\n");
 	Sensors(0);
 	local_control.function = 0x0080;
+	printf("initializing controls...\n");
 	Hyd_Control(local_control);
+	printf("initializing interface/arbitration...\n");
 	Arbitor(status, &local_control);
 	
 	/*infinite loop unless fatal error*/
-	while (!i) {
+	while (i == 0) {
 		i = MainLoop();
 	}
 	
 	/*clean restart*/
-	system("init 6");
+	//system("init 6"); FIXME temporarily disabled for debugging
 }
 
 int MainLoop()

@@ -30,7 +30,7 @@ int Elections()
 	if (ret != 0)
 		return 0;
 	sleep(PING_WAIT);
-	JackDataBase();
+	JackDatabase();
 	sleep(PING_WAIT);
 	JackDatabase();
 	

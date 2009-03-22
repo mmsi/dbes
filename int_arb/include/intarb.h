@@ -16,7 +16,7 @@ extern struct cnt_template_t control;
 extern struct cnt_template_t ui;
 
 /*external status information array*/
-extern struct status_t status_table[MAX_ADDRESSABLE];
+extern struct status_t status_table[];
 
 /*jack addressing*/
 extern int active;

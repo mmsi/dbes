@@ -28,14 +28,14 @@
 int Hyd_Control(struct cnt_template_t control)
 {
 	/*init handler*/
-	if ((control.function & 0x0080) == 1) {
+	if ((control.function & 0x0080) == 0x80) {
 		Dout(0, 0);
 		PWM(0, 0);
 		return 0;
 	}
 	
 	/*contingency handler*/
-	if ((control.function & 0x0001) == 1) {
+	if ((control.function & 0x0001) == 0x1) {
 		Dout(MASTER, OFF);
 		Dout(CHECK, OFF);
 		PWM(0, 1);

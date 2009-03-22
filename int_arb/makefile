@@ -2,16 +2,16 @@
 #jrm<jrcowboy79@gmail.com>
 #3-18-09
 
-CC = gcc
+CC = arm-linux-gcc
 CFLAGS = -I$(sd)
 
-sd = /home/joel/dbes/dbes_src/dbes/
+sd = /home/dbes/
 
 int_arb : intarb.o elections.o slave.o master.o candriver.o ui.o
 
 intarb.h : intarb.h $(sd)include/control_str.h
 
-intarb.o : intarb.c include/intarb.h
+intarb.o : intarb.c $(sd)include/control_str.h
 			$(CC) -c intarb.c $(CFLAGS)include/
 			
 elections.o : elections.c include/intarb.h include/candriver.h\
@@ -26,8 +26,8 @@ master.o : master.c include/intarb.h include/candriver.h
 
 #should i have a candriver.h(canmsg.h) dependency here?
 
-#candriver.o : candriver.c include/can.h
-#				$(CC) -c candriver.c
+candriver.o : candriver.c include/can.h
+				$(CC) -c candriver.c
 
 ui.o : ui.c include/intarb.h
 		$(CC) -c ui.c $(CFLAGS)include/

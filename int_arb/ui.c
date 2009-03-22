@@ -51,7 +51,7 @@ int UI(int mode)
 {
 	int i;
 	static int lift_flag;
-	double total_weight;
+	float total_weight;
 	
 	if (mode == 1) {
 		Nonblock(NB_ENABLE);
@@ -72,18 +72,18 @@ int UI(int mode)
 	}
 	printf("\n weight (lbs)\t|");
 	for (i=0; i<10; i++) {
-		printf(" %f\t|", ((status_table[i].pressure) * CYL_AREA)); //FIXME possible grammar problem
+		printf(" %.ddf\t|", ((status_table[i].pressure) * CYL_AREA));
 	}
 
 	for (i = 0; i == active; i++) {
 		total_weight = (total_weight + (status_table[i].pressure * CYL_AREA));
 	}
-	printf("\n\n Total Weight: %f\t\tLift Rate: %u in/min\t\tDestination:\
-		   %u inches", total_weight, control.rate, control.dest); //FIXME truncate total weight to 0 decimal places
+	printf("\n\n Total Weight: %.df\t\tLift Rate: %u in/min\t\tDestination:\
+		   %u inches", total_weight, control.rate, control.dest);
 	printf("\n\n\n_Key Commands________________________________\n");
-	printf("| START/STOP ---------------- spacebar");
-	printf("| adjust lift rate ---------- l <rate> enter");
-	printf("| momentary lift ------------ m");
+	printf("| START/STOP ---------------- spacebar\n");
+	printf("| adjust lift rate ---------- l <rate> enter\n");
+	printf("| momentary lift ------------ m\n");
 	printf("| zero location ------------- z <y/n> enter\n\n\n");
 	
 	/*status information*/
@@ -95,9 +95,11 @@ int UI(int mode)
 		switch (control.function | 0xFFF9) {
 			case 0xFFF9:
 				printf(" Status: ...holding load");
+				break;
 			
 			case 0xFFFB:
 				printf(" Status: ...lifting");
+				break;
 				
 			case 0xFFFD:
 				printf(" Status: ...lowering");

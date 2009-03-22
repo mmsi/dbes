@@ -6,10 +6,22 @@
  */
  
 #include<stdio.h>
-#include"include/intarb.h"
+#include<unistd.h>
+//#include"include/intarb.h"
+#include"../include/control_str.h"
 
 #define INIT 1
 #define NORM 0
+#define MAX_ADDRESSABLE 255
+
+/*declarations*/
+struct cnt_template_t control;
+struct cnt_template_t ui;
+struct status_t status_table[MAX_ADDRESSABLE];
+int active;
+int jack_lookup_table[MAX_ADDRESSABLE];
+int ui_flag;
+int ini_flag;
 
 int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 {
@@ -35,7 +47,7 @@ int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 		
 		/*probe for ui*/
 		printf("hit the 'any' key if this is the operator...");
-		pause(5);
+		sleep(5);
 		ret = getchar(); //FIXME this is blocking
 		if (ret == 0) { //not ui
 			ui_flag = 0;

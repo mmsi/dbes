@@ -28,6 +28,8 @@
 
 #define DIO_PAGE 0x80840000
 
+extern char *start;
+
 /**
  *caller needs to initialize by using the '0' arg
  *else all other values revert to reading hard-coded pin # for now
@@ -37,11 +39,11 @@ int DI(pin)
 {
 	int init;
 	static unsigned int *pfddr, *pfdr, *gpiofdb;
-	static unsigned char *start;
+	//static unsigned char *start;
 	
 	if (pin == 0) {
-		start = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
-					 devmem, DIO_PAGE);
+		//start = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
+		//			 devmem, DIO_PAGE);
 		//FIXME add mmap error handler
 		/*offsets*/
 		pfddr = (unsigned int *)(start + 0x34);
