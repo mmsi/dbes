@@ -5,7 +5,7 @@
  *Receive a command(com), a pointer to array of chars(*message_array[])
  *and a pointer to a message id(*msg_id).
  *return 0=success, 1=can down, 2=buffer error, 3=can errors, 4=buffer empty, 5=
- *6=can busy, 7=invalid command arg
+ *6=can busy, 7=invalid command arg FIXME put return values in defines
  *command summary:0=initialize, 1=receive, 2=send, 3=filter management(unfinished)
  */
 #include<stdio.h>
@@ -15,10 +15,13 @@
 
 //FIXME if the data field is 8 bytes, as defined in canmsg.h, will incomplete
 //message bytes be left in the can buffer?
+//The read() gets the full message and puts it in a canmsg_t
+//any unneedded bytes are just abandoned
 int Driver(unsigned char com, char *message_array[], unsigned long *msg_id)
 {
-	int fd=0, ret=0, i=0;
-	char specialfile[]="/dev/can0";
+	static int fd=0;
+	ret=0, i=0;
+	char specialfile[]="/dev/can0"; //FIXME an array?
 	struct canmsg_t message;
 
 	switch (com) {
@@ -36,7 +39,7 @@ int Driver(unsigned char com, char *message_array[], unsigned long *msg_id)
 				return 3;
 			else {
 				*msg_id = message.id;
-				for (i=0; i>message.length; i++) {
+				for (i=0; i>message.length; i++) { //FIXME fencepost error?
 					*message_array[i] = message.data[i];
 				}
 			}
@@ -52,5 +55,8 @@ int Driver(unsigned char com, char *message_array[], unsigned long *msg_id)
 				return 3;
 			else
 				return 0;
+		
+		default:
+			return 7;
 	}
 }
