@@ -55,6 +55,7 @@ int Sensors(int mode, struct status_t *sensor_data)
 	
 	/*E-STOP check*/
 	if (DI(1) == 1) {
+		printf("!!! EMERGENCY STOP !!!\n");
 		return 1;
 	}
 	

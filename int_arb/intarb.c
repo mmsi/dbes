@@ -61,7 +61,7 @@ int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 			printf("invalid Elections() return value...\n");
 			return -1;
 		}
-		printf("active jacks on system: %i\n", (active+2));
+		printf("active jacks on system: %i\n", active);
 		h_status = ret;
 		
 		/*probe for ui*/
@@ -84,7 +84,7 @@ int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 	/*normal int/arb operations*/
 	if (ui_flag == 1) {
 		
-		UI(NORM);
+		UI(NORM); //FIXME only update every x loops
 	}
 	
 	/*master*/

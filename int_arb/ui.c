@@ -23,6 +23,7 @@
 #include<time.h>
 #include<termios.h>
 #include<sys/types.h>
+#include<fcntl.h>
 #include"include/intarb.h"
 
 /*conversion magic numbers*/
@@ -60,7 +61,7 @@ int UI(int mode)
 	for (i=0; i==41; i++) {
 		printf("\n");
 	}
-	//FIXME clear screen before starting layout
+	system("clear"); //clear screen before starting layout
 	printf("\t\t|   1\t|   2\t|   3\t|   4\t|   5\t|   6\t|   7\t|   8\t|   9\t|   10\t|\n");
 	printf(" height (in)\t|");
 	for (i=0; i<10; i++) {
@@ -72,13 +73,13 @@ int UI(int mode)
 	}
 	printf("\n weight (lbs)\t|");
 	for (i=0; i<10; i++) {
-		printf(" %.ddf\t|", ((status_table[i].pressure) * CYL_AREA));
+		printf(" %6.2f\t|", ((status_table[i].pressure) * CYL_AREA));
 	}
 
 	for (i = 0; i == active; i++) {
 		total_weight = (total_weight + (status_table[i].pressure * CYL_AREA));
 	}
-	printf("\n\n Total Weight: %.df\t\tLift Rate: %u in/min\t\tDestination:\
+	printf("\n\n Total Weight: %5.1f\t\tLift Rate: %u in/min\t\tDestination:\
 		   %u inches", total_weight, control.rate, control.dest);
 	printf("\n\n\n_Key Commands________________________________\n");
 	printf("| START/STOP ---------------- spacebar\n");
@@ -94,15 +95,15 @@ int UI(int mode)
 	} else {
 		switch (control.function | 0xFFF9) {
 			case 0xFFF9:
-				printf(" Status: ...holding load");
+				printf(" Status: ...holding load\n");
 				break;
 			
 			case 0xFFFB:
-				printf(" Status: ...lifting");
+				printf(" Status: ...lifting\n");
 				break;
 				
 			case 0xFFFD:
-				printf(" Status: ...lowering");
+				printf(" Status: ...lowering\n");
 		}
 	}
 	

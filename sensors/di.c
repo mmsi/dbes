@@ -55,5 +55,5 @@ int DI(pin)
 		return 0;
 	}
 	
-	return (*pfdr & 0x1); //FIXME can 'return' use an expression?
+	return (!(*pfdr & 0x1)); //FIXME can 'return' use an expression?
 }

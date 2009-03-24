@@ -20,7 +20,7 @@
 int Driver(unsigned char com, char *message_array[], unsigned long *msg_id)
 {
 	static int fd=0;
-	ret=0, i=0;
+	int ret=0, i=0;
 	char specialfile[]="/dev/can0"; //FIXME an array?
 	struct canmsg_t message;
 

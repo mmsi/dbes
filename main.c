@@ -24,6 +24,7 @@
  
 #include<stdio.h>
 #include<fcntl.h>
+#include<sys/mman.h>
 #include"include/control_str.h"
 
 #define DIO_PAGE 0x80840000
@@ -53,11 +54,13 @@ int main()
 	Hyd_Control(local_control);
 	printf("initializing interface/arbitration...\n");
 	Arbitor(status, &local_control);
+	/*clear init*/
+	local_control.function = 0x0000;
 	
 	/*infinite loop unless fatal error*/
-	while (i == 0) {
+	do {
 		i = MainLoop();
-	}
+	} while (i == 0);
 	
 	/*clean restart*/
 	//system("init 6"); FIXME temporarily disabled for debugging
@@ -88,7 +91,7 @@ int Contingency(void)
 {
 	int ret;
 	
-	local_control.function = 0x0080;
+	local_control.function = 0x0001;
 	printf("entering contingency mode...\nplease correct problem");
 	printf(" and reset system\n"); //FIXME ui() should handle this and the reset
 	Hyd_Control(local_control);
@@ -99,7 +102,8 @@ int Contingency(void)
 	do {
 		ret = fgetc(stdin);
 	} while (ret != 'r');
-	printf("\n\nresuming normal mode...");
+	local_control.function = 0x0000;
+	printf("\n\nresuming normal mode...\n");
 	 
 	return;
 }
