@@ -20,4 +20,4 @@
  */
  
 /*set jack address*/
-#define UNIQ_ID 0
+#define UNIQ_ID 100
