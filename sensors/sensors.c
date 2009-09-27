@@ -28,10 +28,14 @@
 
 #define PR_TRANS	0x0640
 #define CET			0x0610
+#define POS 		0
+#define PRES		1
+
+int adc_result;
 
 int Sensors(int mode, struct status_t *sensor_data)
 {
-	int adc_result = 0, ret;
+	int ret;
 	
 	/*initialize*/
 	if (mode < 1) {
@@ -76,4 +80,15 @@ int Sensors(int mode, struct status_t *sensor_data)
 		sensor_data->elevation = adc_result;
 	}
 	return 0;
+}
+
+int Sensor_cal(int mode)
+{
+	if (mode == POS) {
+		ADC(CET, &adc_result);
+		return adc_result;
+	} else {
+		ADC(PR_TRANS, &adc_result);
+		return adc_result;
+	}
 }

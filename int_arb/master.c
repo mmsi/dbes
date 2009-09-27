@@ -33,9 +33,8 @@ int Master(struct cnt_template_t *local)
 	}
 
 	/*local ui retrieval*/
-	if (ui_flag == 1) {
-		ControlUpdate(&ui);
-	}
+	ControlUpdate(&ui);
+
 
 	do {
 		ret = Driver(RX, &m_message_array[0], &m_msg_id);
@@ -86,7 +85,7 @@ int Master(struct cnt_template_t *local)
 
 	} while (m_message_array[0] != 0);
 
-	if (cnt_update == 1) { //parse from control to be broadcast
+	if ((control.function && 0x10) == 0x10) { //parse from control to be broadcast
 		m_message_array[0] = (control.function >> 8);
 		m_message_array[1] = (char) control.function;
 		m_message_array[2] = (control.dest >> 8);
@@ -97,6 +96,8 @@ int Master(struct cnt_template_t *local)
 		ret = Driver(TX, &m_message_array[0], &m_msg_id);
 		if (ret != 0)
 			return -1;
+		control.function = (control.function && 0xFFEF);
+			
 	} else {
 		StatusScheduler();
 	}

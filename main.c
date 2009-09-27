@@ -27,26 +27,38 @@
 #include<sys/mman.h>
 #include"include/control_str.h"
 
-#define DIO_PAGE 0x80840000
+#define DIO_PAGE     0x80840000
+#define JUMPER_PAGE  0x22800000
+#define POS			 0
+#define PRES		 1
 
 /*prototypes*/
 int MainLoop();
 int Contingency(void);
+int Configuration(void);
 
 struct status_t status;
 struct cnt_template_t local_control; //FIXME need better scope?
 int devmem;
 char *start;
+FILE fp;
+char calib[27];
 
 int main()
 {
-	int i;
+	int i, c;
+	char *jump6;
+	
 	
 	devmem = open("dev/mem", O_RDWR|O_SYNC);
 	
 	/*init all segments*/
 	start = mmap(0, 4096, PROT_READ|PROT_WRITE, MAP_SHARED,
 				 devmem, DIO_PAGE);
+	jump6 = mmap(0, 4096, PROT_READ|PROT_WRITE, MAP_SHARED,
+				devmem, JUMPER_PAGE);
+	
+	h_status = (*jump6 & 0x1);
 	printf("initializing sensors...\n");
 	Sensors(0);
 	local_control.function = 0x0080;
@@ -54,6 +66,39 @@ int main()
 	Hyd_Control(local_control);
 	printf("initializing interface/arbitration...\n");
 	Arbitor(status, &local_control);
+	
+	/*configuration prompt*/
+	if (h_status == 1 ) {
+		/*master*/
+		printf("would you like to enter configuration? y/n   ");
+		while ((c = getchar()) != 'y' || 'n')
+		if (c == 'y') {
+			Configuration();
+		} else {
+			fp = fopen("data", "r");
+			if  (fp == -1) {
+				fclose(fp);
+				Configuration();
+			} else {
+				for (i = 0; i <= 27; i++) {
+					calib[i] = getc(fp);
+				}
+				fclose(fp);
+			}
+		}
+	} else {
+		/*slave*/
+		fp = fopen("data", "r");
+		if (fp == -1) {
+			printf("no configuration file");
+			exit(0);
+		}
+		for (i = 0; i <= 27; i++) {
+			calib[i] = getc(fp);
+		fclose(fp);
+		}
+	}
+
 	/*clear init*/
 	local_control.function = 0x0000;
 	
@@ -106,4 +151,75 @@ int Contingency(void)
 	printf("\n\nresuming normal mode...\n");
 	 
 	return;
+}
+
+int Configuration(void)
+{
+	char str[20];
+	int raw;
+	char c;
+	
+	fp = fopen("data", "w");
+	
+	/*address*/
+	//printf("current address is: %c%c%c\n", calib[0],
+	//		calib[1], calib[2]);
+	printf("would you like to change the address? y/n   ");
+	while ((c = getchar()) != 'y' || 'n') {
+		printf("\njust enter 'y' or 'n', moron");
+	}
+	if (c == 'y') {
+		printf("\nplease enter a three digit number:   ");
+		while ((strlen(gets(&str))) != 3) {
+			printf("\ntry again - 3 digits, press enter!");
+		}
+	}
+	//FIXME - store address
+	
+	/*pressure*/
+	/*
+	printf("\nset system pressure to zero and wait for the prompt\n");
+	sleep(5);
+	Sensor_cal(raw, PRES);
+	printf("zero set at %u\n", raw);
+	//FIXME parse to file
+	printf("disconnect return hose\n");
+	printf("set system to full pressure and enter the gauge ");
+	printf("pressure\n");
+	(float)(Sensor_cal(raw, PRES) / (atoi(gets(&str))));
+	*/
+
+	/*Position Transducer*/
+	/*offset*/
+	printf("\nset jack height down and press  enter");
+	local_control.function = 0x4;
+	local_control.dest = 0x0;
+	local_control.rate = 0xFF;
+	Hyd_Control(local_control);
+	getchar();
+	local_control.function = 0x0;
+	Hyd_Control(local_control);
+	raw = Sensor_cal(POS);
+	printf("zero at %u\n", raw);
+	fprintf(fp, "%4u", raw);
+	//FIXME need to load this value locally
+	
+	/*scale*/
+	printf("press enter when height is 24 to 36 inches\n");
+	local_control.function = 0x2;
+	local_control.dest = 0xFFFF; //FIXME .dest useless here?
+	local_control.rate = 0xFF;
+	Hyd_Control(local_control);
+	getchar();
+	local_control.function = 0x0;
+	Hyd_Control(local_control);
+	printf("enter height as xx.xx:   ");
+	gets(&str); //FIXME add string test
+	raw = (float)(((Sensor_cal(POS)) - raw) / (atof(gets(&str))));
+	fprintf("data", "%4.3f", raw);
+	
+	local_control.function = 0x4;
+	local_control.rate = 0xFF;
+	Hyd_Control(local_control);
+	printf("calibration complete");
 }

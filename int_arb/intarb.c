@@ -43,7 +43,7 @@ int ini_flag = 0;
 int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 {
 	int ret;
-	static int h_status;
+	static int h_status; //FIXME extern to Main
 	
 	
 	if (ini_flag == 0) {
@@ -53,25 +53,10 @@ int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 			printf("FAILURE!!!\nactive jacks detected: %i\n", active);
 			printf("check connections and restart system\n\n");
 			return -1;
-		} else if (ret = 1) {
-			printf("this jack is a slave\n");
-		} else if (ret = 2) {
-			printf("this jack is the master\n");
-		} else {
-			printf("invalid Elections() return value...\n");
-			return -1;
 		}
 		printf("active jacks on system: %i\n", active);
-		h_status = ret;
-		
-		/*probe for ui*/
-		printf("hit the 'any' key if this is the operator...");
-		sleep(5);
-		ret = getchar(); //FIXME this is blocking should move to UI()
-		if (ret == 0) { //not ui
-			ui_flag = 0;
-		} else { //char received, ui local
-			ui_flag = 1;
+
+		if (h_status == 1) {
 			UI(INIT);
 		}
 		ini_flag = 1;
@@ -82,13 +67,10 @@ int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 	status_table[0] = local_status;
 	
 	/*normal int/arb operations*/
-	if (ui_flag == 1) {
-		
-		UI(NORM); //FIXME only update every x loops
-	}
 	
 	/*master*/
 	if (h_status == 1) {
+		UI(NORM); //FIXME only update every x loops
 		ret = Master(local);
 		if (ret < 0) {
 			printf("master routine error, calling contingency.");
