@@ -1,7 +1,7 @@
 /**
  *dbes/control_str.h
  *origin 2-24-09
- *modified 2-26-09
+ *modified 10-6-09
  *jrm<jrcowboy79@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,11 +22,12 @@
 /**
  *cnt_template_t
  *unsigned short function		address and/or other information
- *		bit 0					contingency flag
- *		bits 1,2				lift - 00: idle, 01: lift, 10: lower
- *		bits 3-6				undefined
- *		bit 7					init flag
- *		byte 1					jack id
+ *		bit 0			contingency flag
+ *		bits 1,2		lift - 00: idle, 01: lift, 10: lower
+ *		bit 3			control flag - 0: auto, 1: manual
+ *		bits 4-6		undefined
+ *		bit 7			init flag
+ *		byte 1			jack id
  *unsigned short dest			destination height
  *unsigned char rate			lifting rate - raw linear 0-255
  */
@@ -40,14 +41,25 @@ struct cnt_template_t {
 
 /**
  *status_t
- *
+ *unsigned char function		undefined
+ *unsigned short elevation		elevation
+ *unsigned short pressure		pressure transducer
+ *unsigned char d_input			button and limit switches
+ *		bit 0			e-stop
+ *		bit 1			up button
+ *		bit 2			down button
+ *		bit 3			cylinder extend limit switch
+ *		bit 4			tilt interlock switch
+ *		bits 5-7		undefined
+ */
 
 /*individual jack status type*/
 struct status_t {
 	unsigned char function;
 	unsigned short elevation;
 	unsigned short pressure;
+	unsigned char d_input;
 };
 
-/*global fd for mmap to use*/
+/*global file descriptor for mmap to use*/
 extern int devmem;

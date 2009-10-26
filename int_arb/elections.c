@@ -1,8 +1,11 @@
 /**
  *int_arb/elections.c
  *2-16-09
+ *modified 9-27-09
  *jrm
- *elect a master in concert with other jacks on the net
+ *master/slave selection is now done with jumpers
+ *but I still need a place to build the jack database
+ *so... laziness retains the name 'elections.c'
  */
 
 #include<unistd.h>
@@ -26,30 +29,10 @@ int Elections()
 	int i = 0;
 	int ret;
 
-	printf("starting elections\n");
-	/*check for existing master*/
-	printf("checking for master...\n");
-	active = 1;
-	e_msg_id = MASTER_PING;
-	ret = Driver(TX, &e_message_array[0], &e_msg_id);
-	if (ret != 0)
-		return 0;
-	
-	sleep(PING_WAIT);
-	JackDatabase();
-	sleep(PING_WAIT);
-	JackDatabase();
-	
-	/*elect master*/
-	if (master_flag == 0) {
-		do {
-			if (UNIQ_ID < jack_lookup_table[i]) {
-				return 1; //slave FIXME slave with local ui still needs to know th # of jacks (active)
-			}
-			i++;
-		} while(jack_lookup_table[i] != 0);
-	}
-	return 2; //master
+	/*initialize CAN*/
+	ret = Driver(INI, &e_message_array[0], &e_msg_id);
+
+	return 1;
 }
 
 int JackDatabase()

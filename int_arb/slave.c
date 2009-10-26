@@ -5,6 +5,22 @@
  *
  */
 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
+ */
+
 #include"include/intarb.h"
 #include"include/candriver.h"
 #include"../include/unique.h"
@@ -56,17 +72,6 @@ int Slave(struct cnt_template_t *local)
 			}
 		} while (s_message_array[0] != 0);
 
-		if (ui_flag == 1) {
-			s_message_array[0] = (ui.function >> 8);
-			s_message_array[1] = (char) ui.function;
-			s_message_array[2] = (ui.dest >> 8);
-			s_message_array[3] = (char) ui.dest;
-			s_message_array[4] = ui.rate;
-			s_msg_id = UIPASS;
-			ret = Driver(TX, &s_message_array[0], &s_msg_id);
-			if (ret != 0)
-				return -1;
-		}
 	}
 	return 0;
 }

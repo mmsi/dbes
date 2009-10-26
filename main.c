@@ -91,7 +91,7 @@ int main()
 		fp = fopen("data", "r");
 		if (fp == -1) {
 			printf("no configuration file");
-			exit(0);
+			exit(0); //FIXME better alerting of operator
 		}
 		for (i = 0; i <= 27; i++) {
 			calib[i] = getc(fp);
@@ -139,8 +139,8 @@ int Contingency(void)
 	local_control.function = 0x0001;
 	printf("entering contingency mode...\nplease correct problem");
 	printf(" and reset system\n"); //FIXME ui() should handle this and the reset
-	Hyd_Control(local_control);
-	Arbitor(status, &local_control);
+	Hyd_Control(local_control); // shut off all valves
+	Arbitor(status, &local_control); //send contingency over CAN
 	
 	/*reset handler*/
 	printf("press 'r' to reset: ");
@@ -185,7 +185,7 @@ int Configuration(void)
 	//FIXME parse to file
 	printf("disconnect return hose\n");
 	printf("set system to full pressure and enter the gauge ");
-	printf("pressure\n");
+	printf("reading\n");
 	(float)(Sensor_cal(raw, PRES) / (atoi(gets(&str))));
 	*/
 

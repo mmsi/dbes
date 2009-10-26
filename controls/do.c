@@ -27,24 +27,22 @@
 #include"include/control.h"
 #include"../include/control_str.h"
 
-#define DIO_PAGE 0x80840000
 
 extern char *start;
 
 /**
- *uses port b
- *pin variable 0-7 corresponds to DIO_0 thru DIO_7
+ *uses ep9302 port B
+ *pin variable 1,2,4,8,16,32,64,128 corresponds to DIO_0 thru DIO_7
+ *as defined in control.h
  */
 int Dout(int pin, int state)
 {
 	static unsigned int *pbdr, *pbddr;
-	//static unsigned char *start;
 	
 	/*initialization*/
 	if (pin == 0) {
-		/*start = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
-						devmem, DIO_PAGE);
-		*/
+		//start = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
+		//				devmem, DIO_PAGE);
 		
 		/*offsets*/
 		pbdr = (unsigned int *)(start + 0x04);
@@ -57,7 +55,7 @@ int Dout(int pin, int state)
 	
 	/*toggle pin*/
 	if (state == ON) {
-		*pbdr = (*pbdr + pin); //FIXME if this is already on, adding will be bad
+		*pbdr = (*pbdr | pin);
 	} else if (state == OFF) {
 		*pbdr = (*pbdr & (~pin));
 	} else {

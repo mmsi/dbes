@@ -22,38 +22,37 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
  
-//#include"sensor_struct.h"
+
 #include<sys/mman.h>
 #include"../include/control_str.h"
 
-#define DIO_PAGE 0x80840000
 
 extern char *start;
 
 /**
  *caller needs to initialize by using the '0' arg
- *else all other values revert to reading hard-coded pin # for now
- *port F, pin 0
+ *uses ep9302 port A (ts7260 lcd header)
+ *
  */
-int DI(pin)
+
+int DI(mode)
 {
 	int init;
-	static unsigned int *pfddr, *pfdr, *gpiofdb;
-	//static unsigned char *start;
+	static unsigned int *paddr, *padr, *gpioadb;
 	
-	if (pin == 0) {
+	if (mode == 0) {
 		//start = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
 		//			 devmem, DIO_PAGE);
-		//FIXME add mmap error handler
+
 		/*offsets*/
-		pfddr = (unsigned int *)(start + 0x34);
-		pfdr = (unsigned int *)(start + 0x30);
-		gpiofdb = (unsigned int *)(start + 0x64);
+		paddr = (unsigned int *)(start + 0x10);
+		padr = (unsigned int *)start;
+		gpioadb = (unsigned int *)(start + 0xA8);
 		
-		*gpiofdb = (*gpiofdb & 0x1);
-		//pfddr defaults to inputs
+		*gpioadb = 0xF;
+		//paddr defaults to inputs
 		return 0;
 	}
 	
-	return (!(*pfdr & 0x1)); //FIXME can 'return' use an expression?
+	return (*padr);
 }

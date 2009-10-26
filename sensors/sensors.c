@@ -41,7 +41,7 @@ int Sensors(int mode, struct status_t *sensor_data)
 	if (mode < 1) {
 		ret = DI(0);
 		if (ret != 0) {
-			printf("error initializing port F...\n");
+			printf("error initializing port A...\n");
 		}
 		
 		ret = ADC(0, &adc_result);
@@ -57,10 +57,8 @@ int Sensors(int mode, struct status_t *sensor_data)
 		return 0;
 	}
 	
-	/*E-STOP check*/
-	if (DI(1) == 1) {
-		printf("!!! EMERGENCY STOP !!!\n");
-		return 1;
+	/*  read buttons and switches  */
+	sensor_data->d_input = DI(1);
 	}
 	
 	/*  read sensors  */
@@ -87,8 +85,9 @@ int Sensor_cal(int mode)
 	if (mode == POS) {
 		ADC(CET, &adc_result);
 		return adc_result;
-	} else {
+	} else if (mode == PRES) {
 		ADC(PR_TRANS, &adc_result);
 		return adc_result;
-	}
+	} else {
+		return (DI(1));
 }
