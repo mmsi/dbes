@@ -73,10 +73,11 @@ int main()
 		printf("would you like to enter configuration? y/n   ");
 		while ((c = getchar()) != 'y' || 'n')
 		if (c == 'y') {
+			//FIXME grab old config here so user can compare
 			Configuration();
 		} else {
-			fp = fopen("data", "r");
-			if  (fp == -1) {
+			fp = fopen("config", "r");
+			if  (fp < 0) {
 				fclose(fp);
 				Configuration();
 			} else {
@@ -88,10 +89,10 @@ int main()
 		}
 	} else {
 		/*slave*/
-		fp = fopen("data", "r");
-		if (fp == -1) {
+		fp = fopen("config", "r");
+		if (fp < 0) {
 			printf("no configuration file");
-			exit(0); //FIXME better alerting of operator
+			exit(0); //FIXME better alerting of operator, maybe over CAN
 		}
 		for (i = 0; i <= 27; i++) {
 			calib[i] = getc(fp);
@@ -159,35 +160,34 @@ int Configuration(void)
 	int raw;
 	char c;
 	
-	fp = fopen("data", "w");
+	fp = fopen("config", "w"); //FIXME add error handler
 	
 	/*address*/
-	//printf("current address is: %c%c%c\n", calib[0],
-	//		calib[1], calib[2]);
+	printf("current address is: %c%c%c\n", calib[0],
+			calib[1], calib[2]);
 	printf("would you like to change the address? y/n   ");
 	while ((c = getchar()) != 'y' || 'n') {
 		printf("\njust enter 'y' or 'n', moron");
 	}
 	if (c == 'y') {
 		printf("\nplease enter a three digit number:   ");
-		while ((strlen(gets(&str))) != 3) {
+		while ((strlen(gets(&str))) != 3) {//FIXME also check for numericness
 			printf("\ntry again - 3 digits, press enter!");
 		}
 	}
 	//FIXME - store address
 	
 	/*pressure*/
-	/*
 	printf("\nset system pressure to zero and wait for the prompt\n");
 	sleep(5);
 	Sensor_cal(raw, PRES);
 	printf("zero set at %u\n", raw);
-	//FIXME parse to file
+	//FIXME write to file
 	printf("disconnect return hose\n");
 	printf("set system to full pressure and enter the gauge ");
 	printf("reading\n");
 	(float)(Sensor_cal(raw, PRES) / (atoi(gets(&str))));
-	*/
+
 
 	/*Position Transducer*/
 	/*offset*/
@@ -201,8 +201,8 @@ int Configuration(void)
 	Hyd_Control(local_control);
 	raw = Sensor_cal(POS);
 	printf("zero at %u\n", raw);
+	//FIXME lseek() to proper place
 	fprintf(fp, "%4u", raw);
-	//FIXME need to load this value locally
 	
 	/*scale*/
 	printf("press enter when height is 24 to 36 inches\n");

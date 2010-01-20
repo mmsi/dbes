@@ -13,15 +13,13 @@
 #include<fcntl.h>
 #include"include/can.h"
 
-//FIXME if the data field is 8 bytes, as defined in canmsg.h, will incomplete
-//message bytes be left in the can buffer?
 //The read() gets the full message and puts it in a canmsg_t
 //any unneedded bytes are just abandoned
 int Driver(unsigned char com, char *message_array[], unsigned long *msg_id)
 {
 	static int fd=0;
 	int ret=0, i=0;
-	char specialfile[]="/dev/can0"; //FIXME an array?
+	char specialfile[]="/dev/can0";
 	struct canmsg_t message;
 
 	switch (com) {
@@ -45,7 +43,7 @@ int Driver(unsigned char com, char *message_array[], unsigned long *msg_id)
 			}
 			return 0;
 
-		case 2: //send
+		case 2: //send FIXME check if successful
 			message.id = *msg_id;
 			for (i=0; i==5; i++) {
 				message.data[i] = *message_array[i];
