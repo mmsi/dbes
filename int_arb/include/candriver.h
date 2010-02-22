@@ -1,7 +1,26 @@
 /**
  *int_arb/candriver.h
- *2-15-09
- *jrm
+ */
+
+/**
+ *(C) 2010 by Joel R. Morgan <jrcowboy79@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Library General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
+ */
+
+/**
  *definitions for functions interacting with Driver()
  *Byte 0: jack address
  *Byte 1: function - bit 0 contingency bit, bits 1,2 lift status
@@ -12,9 +31,10 @@
 
 /*driver control defines*/
 #define INI 0
-#define TX 1
-#define RX 2
-#define FILTER 3
+#define RX 1
+#define TX 2
+#define CLOSE 3
+#define FILTER 4
 
 /*max number of CAN data bytes*/
 #define MSG_LENGTH 6
@@ -28,5 +48,7 @@
 #define STATUS 5	   //6 bytes - note exception
 #define UIPASS 6	   //5 bytes
 #define PING_REPLY 7   //no data
+
+//FIXME add defines for return conditions
 
 int Driver(unsigned char, char *, unsigned long *);

@@ -1,8 +1,12 @@
 /**
- *adc_main.c
+ *sensors/adc/adc_main.c
  *origin 2-25-09
  *updated 2-26-09
  *jrm<jrcowboy79@gail.com>
+ */
+ 
+/**
+ *(C) 2010 by Joel R. Morgan <jrcowboy79@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

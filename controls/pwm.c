@@ -1,5 +1,5 @@
 /***************************************************************************
- *            dbes/hyd_control/pwm.c
+ *            hyd_control/pwm.c
  *
  *  Tue Mar  3 10:55:58 2009
  *  Copyright  2009  Joel Morgan

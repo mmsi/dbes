@@ -1,12 +1,12 @@
 /***************************************************************************
- *            dbes/sensors/sensors.c
+ *            sensors/sensors.c
  *
  *  Fri Feb 27 11:23:38 2009
  *  Copyright  2009  Joel Morgan
  *  <jrcowboy79@gmail.com>
  ****************************************************************************/
 
-/*
+/**
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or

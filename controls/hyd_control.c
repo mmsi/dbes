@@ -1,5 +1,5 @@
 /***************************************************************************
- *            hyd_control.c
+ *            controls/hyd_control.c
  *
  *  Mon Mar  9 10:43:41 2009
  *  Copyright  2009  Joel Morgan

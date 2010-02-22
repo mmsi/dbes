@@ -1,5 +1,5 @@
 /***************************************************************************
- *            dbes/hyd_control/DO.c
+ *            dbes/hyd_control/do.c
  *
  *  Fri Feb 27 17:14:16 2009
  *  Copyright  2009  Joel Morgan

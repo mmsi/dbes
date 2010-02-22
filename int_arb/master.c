@@ -1,22 +1,22 @@
 /**
  * master.c
- * 2-15-09
- * jrm
  * if elected 'master', this routine runs to glue the ui(remote or local) to
  * other jacks
  */
 
-/*
+/**
+ *(C) 2010 by Joel R. Morgan <jrcowboy79@gmail.com>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Library General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
@@ -40,8 +40,8 @@ int Master(struct cnt_template_t *local)
 	if (local->function | 0xFFFE == 0xFFFF) {
 		m_msg_id = 3;
 		m_message_array[0] = 0; //on a cont broadcast data can be garbage
-		ret = Driver(TX, &m_message_array[0], &m_msg_id);
-		if (ret != 0) {
+		ret = Driver(TX, &m_message_array[0], &m_msg_id); //FIXME need handlers
+		if (ret != 0) {//for different errors and return codes
 			return -1;
 		} else {
 			control.function = 1;

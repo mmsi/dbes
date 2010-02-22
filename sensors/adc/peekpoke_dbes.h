@@ -1,5 +1,5 @@
 /**
- *peekpoke_dbes.h
+ *sensors/adc/peekpoke_dbes.h
  *modified 2-26-09
  *jrm<jrcowboy79@gmail.com>
  */
