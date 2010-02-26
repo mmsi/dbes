@@ -23,6 +23,8 @@
  */
 
 #include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
 #include<fcntl.h>
 #include<sys/mman.h>
 #include"include/control_str.h"
@@ -47,7 +49,7 @@ struct status_t status;
 struct cnt_template_t local_control; //FIXME need better scope?
 int devmem;
 char *start;
-FILE fp;
+FILE *fp;
 char calib[27];
 
 int main()

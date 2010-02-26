@@ -45,8 +45,6 @@ int ini_flag = 0;
 int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 {
 	int ret;
-	static int h_status; //FIXME extern to Main
-	
 	
 	if (ini_flag == 0) {
 		printf("Initializing network...  ");

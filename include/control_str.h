@@ -67,3 +67,6 @@ struct status_t {
 
 /*global file descriptor for mmap to use*/
 extern int devmem;
+
+/*hierarchy status on system*/
+extern int h_status;
