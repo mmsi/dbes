@@ -1,13 +1,25 @@
 #dbes_alpha makefile
 #origin 2-25-09
-#updated 2-25-09
+#updated 2-25-10
 #jrm
 
 srcdir = .
 
-CC = arm-linux-gcc
-CFLAGS = -I$(srcdir)
+#Tool names
+CROSS_COMPILE   = ${TARGET_PREFIX}-
+AS                          = $(CROSS_COMPILE)as
+AR                          = $(CROSS_COMPILE)ar
+CC                          = $(CROSS_COMPILE)gcc
+CPP                        = $(CC) -E
+LD                          = $(CROSS_COMPILE)ld
 
+#Build settings
+CFLAGS                  = -I$(srcdir) -mcpu=arm9
+
+#Installation variables
+EXEC_NAME           = dbes_alpha
+
+#Build files
 SUBDIRS = int_arb controls sensors
 
 OBJ1 = int_arb/intarb.o int_arb/ui.o int_arb/elections.o int_arb/slave.o\
@@ -18,14 +30,14 @@ OBJ4 = main.o
 OBJS = $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4)
 			 
 dbes_alpha :	$(OBJ4) subdirs
-				$(CC) -o dbes_alpha $(OBJS)
+				$(CC) -o $(EXEC_NAME) $(OBJS)
 
 #cd subdir && $(MAKE)
 
 
 .PHONY: subdirs $(SUBDIRS)
 
-subdirs: $(SUBDIRS)
+subdirs : $(SUBDIRS)
 
 $(SUBDIRS):
 		$(MAKE) -C $@
