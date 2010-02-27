@@ -3,7 +3,7 @@
 #updated 2-25-10
 #jrm
 
-srcdir = .
+srcdir = $(PRJROOT)
 
 #Tool names
 CROSS_COMPILE   = ${TARGET_PREFIX}-
@@ -13,8 +13,12 @@ CC                          = $(CROSS_COMPILE)gcc
 CPP                        = $(CC) -E
 LD                          = $(CROSS_COMPILE)ld
 
+export AS AR CC CPP LD
+
 #Build settings
-CFLAGS                  = -I$(srcdir) -mcpu=arm9
+CFLAGS                  = -I$(srcdir)/include -mcpu=arm9 -Wall
+export CFLAGS
+export srcdir
 
 #Installation variables
 EXEC_NAME           = dbes_alpha
@@ -45,7 +49,7 @@ $(SUBDIRS):
 
 				
 main.o :	main.c include/control_str.h
-			$(CC) -c main.c
+			$(CC) -c main.c $(CFLAGS)
 			
 .PHONY : clean
 

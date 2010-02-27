@@ -26,6 +26,7 @@
 #include<termios.h>
 #include<sys/types.h>
 #include<fcntl.h>
+#include"../include/control_str.h"
 #include"include/intarb.h"
 
 /*conversion magic numbers*/

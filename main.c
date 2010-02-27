@@ -51,6 +51,7 @@ int devmem;
 char *start;
 FILE *fp;
 char calib[27];
+int h_status;
 
 int main()
 {

@@ -28,6 +28,7 @@
 
 #include<unistd.h>
 #include<stdio.h>
+#include"../include/control_str.h"
 #include"include/intarb.h"
 #include"include/candriver.h"
 #include"../include/unique.h"

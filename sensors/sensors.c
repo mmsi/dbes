@@ -59,7 +59,6 @@ int Sensors(int mode, struct status_t *sensor_data)
 	
 	/*  read buttons and switches  */
 	sensor_data->d_input = DI(1);
-	}
 	
 	/*  read sensors  */
 	/*pressure*/
@@ -88,6 +87,6 @@ int Sensor_cal(int mode)
 	} else if (mode == PRES) {
 		ADC(PR_TRANS, &adc_result);
 		return adc_result;
-	} else {
+	} else
 		return (DI(1));
 }
