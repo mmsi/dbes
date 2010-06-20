@@ -41,9 +41,6 @@ int DI(mode)
 	static unsigned int *paddr, *padr, *gpioadb;
 	
 	if (mode == 0) {
-		//start = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
-		//			 devmem, DIO_PAGE);
-
 		/*offsets*/
 		paddr = (unsigned int *)(start + 0x10);
 		padr = (unsigned int *)start;

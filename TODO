@@ -1,0 +1,5 @@
+dbes TODO list:
+
+-Make zeroing non-volatile. save to configuration file every time the jack is
+	zeroed. As-is the system must be zeroed every time it is setup or pwoer is
+	lost

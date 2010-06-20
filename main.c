@@ -46,7 +46,7 @@ int Contingency(void);
 int Configuration(void);
 
 struct status_t status;
-struct cnt_template_t local_control; //FIXME need better scope?
+struct cnt_template_t local_control;
 int devmem;
 char *start;
 FILE *fp;
@@ -74,13 +74,13 @@ int main()
 	printf("initializing controls...\n");
 	Hyd_Control(local_control);
 	printf("initializing interface/arbitration...\n");
-	Arbitor(status, &local_control);
+	Arbitor(&status, &local_control);
 
 	/*configuration prompt*/
 	if (h_status == 1 ) {
 		/*master*/
 		fp = fopen(CONFIG_NAM, "r");
-		if (fp >= 0) {
+		if (fp != NULL) {
 			for (i=0; i<=MAX_CONFIG; i++)
 				calib[i] = getc(fp);
 			fclose(fp);
@@ -90,13 +90,13 @@ int main()
 			need to jump past the prompt below*/
 		}
 		printf("would you like to enter configuration? y/n   ");
-		while ((c = getchar()) != 'y' || 'n')
+		while ((c = getchar()) != ('y' || 'n'))
 		if (c == 'y')
 			Configuration();
 	} else {
 		/*slave*/
 		fp = fopen(CONFIG_NAM, "r");
-		if (fp < 0) {
+		if (fp == NULL) {
 			printf("no configuration file");
 			exit(0); //FIXME better alerting of operator, maybe over CAN
 		}
@@ -106,6 +106,7 @@ int main()
 	}
 
 	bypass:
+	local_id = (calib[0]*100) + (calib[1]*10) + calib[2];
 	/*clear init*/
 	local_control.function = 0x0000;
 
@@ -126,16 +127,22 @@ int MainLoop()
 		return 0;
 	}
 
-	/*get control orders*/
-	if (Arbitor(status, &local_control) < 0) {
-		printf("int/arb error...\n");
-		Contingency();
-		return 0;
+	if ((local_control.function & 0x4) == 0x4) {
+		//FIXME need to set rate?
+		if ((status.d_input & 0x1) == 0x1)
+			local_control.function = 0x5;
+		else if ((status.d_input & 0x2) == 0x2)
+		    local_control.function = 0x6;
+		else
+		    local_control.function = 0x4;
+		Hyd_Control(local_control);
+		if (Arbitor(&status, &local_control) < 0)
+			Contingency();
+	} else {
+		if (Arbitor(&status, &local_control) < 0)
+			Contingency();
+		Hyd_Control(local_control);
 	}
-
-	/*actuate hydraulics*/
-	Hyd_Control(local_control);
-
 	return 0;
 }
 
@@ -147,7 +154,7 @@ int Contingency(void)
 	printf("entering contingency mode...\nplease correct problem");
 	printf(" and reset system\n"); //FIXME ui() should handle this and the reset
 	Hyd_Control(local_control); // shut off all valves
-	Arbitor(status, &local_control); //send contingency over CAN
+	Arbitor(&status, &local_control); //send contingency over CAN
 
 	/*reset handler*/
 	printf("press 'r' to reset: ");
@@ -171,17 +178,17 @@ int Configuration(void)
 	}
 
 	/*address*/
-	printf("current address is: %c3\n", calib[0]);
+	printf("current address is: %3c\n", calib[0]);//FIXME
 	printf("would you like to change the address? y/n   ");
-	while ((c = getchar()) != 'y' || 'n') {
-		printf("\njust enter 'y' or 'n', moron");
-	}
+	while ((c = getchar()) != ('y' || 'n'))
 	if (c == 'y') {
-		printf("\nplease enter a three digit number:   ");
-		while ((strlen(gets(&str))) != 3) {//FIXME check for numericness
+		printf("\nthe address must be three numeric digits and must not ex");
+		printf("ceed 255\nplease enter a three digit number:   ");
+		//FIXME gets() is generating a warning, strlen is segfaulting
+		while ((strlen(gets(str[0]))) != 3) {//FIXME check for numericness
 			printf("\ntry again - 3 digits, press enter!");
 		}
-		fprintf(fp, "%s3", str);
+		fprintf(fp, "%s3", str[0]);
 	} else
 		fprintf(fp, "%s3", calib[0]);
 	
@@ -221,7 +228,7 @@ int Configuration(void)
 	local_control.function = 0x0;
 	Hyd_Control(local_control);
 	printf("enter height as xx.xx:   ");
-	gets(&str); //FIXME add string test
+	gets(str[0]); //FIXME add string test
 	raw = (float)(((Sensor_cal(POS)) - raw) / (atof(gets(&str))));
 	fprintf(fp, "%4.3f", raw);
 

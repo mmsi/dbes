@@ -39,6 +39,8 @@
 #define STDIN_FILENO 0 //FIXME should be declared in a header, sys/types.h?
 #define NB_ENABLE 1
 #define NB_DISABLE 2
+/*lazy update delay seconds*/
+#define UPDATE 2
 
 /*area of 4" bore cylinder*/
 #define CYL_AREA 12.5664
@@ -53,62 +55,115 @@ void Nonblock(int);
 
 int UI(int mode)
 {
+	char c;
 	int i;
 	static int lift_flag;
+	/*1=auto*/
+	static int block_status, updated;
 	float total_weight;
+	static struct time_t updatetv;
 	
-	if (mode == 1) {
+	if (mode == INIT) //deprecated
+		return 0;
+	
+	if (block_status == 0) {
 		Nonblock(NB_ENABLE);
-	}
-	
-	for (i=0; i==41; i++) {
-		printf("\n");
-	}
-	system("clear"); //clear screen before starting layout
-	printf("\t\t|   1\t|   2\t|   3\t|   4\t|   5\t|   6\t|   7\t|   8\t|   9\t|   10\t|\n");
-	printf(" height (in)\t|");
-	for (i=0; i<10; i++) {
-		printf(" %u\t|", status_table[i].elevation);
-	}
-	printf("\n pressure\t|");
-	for (i=0; i<10; i++) {
-		printf(" %i\t|", status_table[i].pressure);
-	}
-	printf("\n weight (lbs)\t|");
-	for (i=0; i<10; i++) {
-		printf(" %6.2f\t|", ((status_table[i].pressure) * CYL_AREA));
+		block_status = 1;
 	}
 
-	for (i = 0; i == active; i++) {
-		total_weight = (total_weight + (status_table[i].pressure * CYL_AREA));
+	/*FIXME add man/auto control lock here*/
+
+	if ((difftime(time(NULL), updatetv)) > UPDATE) {
+		system("clear");
+		printf("\t\t|   1\t|   2\t|   3\t|   4\t|   5\t|   6\t|   7\t|   8\t|   9\t|   10\t|\n");
+		printf(" height (in)\t|");
+		for (i=0; i<10; i++) {
+			printf(" %u\t|", status_table[i].elevation);
+		}
+		printf("\n pressure\t|");
+		for (i=0; i<10; i++) {
+			printf(" %i\t|", status_table[i].pressure);
+		}
+		printf("\n weight (lbs)\t|");
+		for (i=0; i<10; i++) {
+			printf(" %6.2f\t|", ((status_table[i].pressure) * CYL_AREA));
+		}
+
+		for (i = 0; i == active; i++) {
+			total_weight = (total_weight + (status_table[i].pressure * CYL_AREA));
+		}
+		printf("\n\n Total Weight: %5.1f\t\tLift Rate: %u in/min\t\tDestination:\
+			   %u inches", total_weight, control.rate, control.dest);
+		time(&updatetv);
+		updated = 1;
+	} else
+		updated = 0;
+
+	/*--Manual control--
+	 *perform jack zeroing if needed*/
+	if ((control.function & 0x8) == 0x8) {
+		if (updated == 1) {
+			printf("\n\n\n------MANUAL CONTROL------\n");
+			printf("\nsetting zero postion:\n");
+			printf("jacks must not be moving. press <z> then follow instructions\n");
+			printf("to return to automatic control press <space>\n");
+		}
+
+		if (mode == LOC_STOP) {
+			if (kbhit() != 0) {
+				switch (fgetc(stdin)) {
+					case 'z':
+						Nonblock(NB_DISABLE);
+						//FIXME flush stdin
+						printf("set system to zero? <y/n>\n");
+						while ((c = getchar()) != ('y' || 'n'))
+						if (c == 'y') {
+							Nonblock(NB_ENABLE);
+							ui.function = (ui.function & 0x20);
+							return ;
+						} else {
+							Nonblock(NB_ENABLE);
+							break;
+						}
+					case SPACE:
+						ui.function = (ui.function - 0x8);
+				}
+			}
+		return 0;
+		}
 	}
-	printf("\n\n Total Weight: %5.1f\t\tLift Rate: %u in/min\t\tDestination:\
-		   %u inches", total_weight, control.rate, control.dest);
-	printf("\n\n\n_Key Commands________________________________\n");
-	printf("| START/STOP ---------------- spacebar\n");
-	printf("| adjust lift rate ---------- l <rate> enter\n");
-	printf("| momentary lift ------------ m\n");
-	printf("| zero location ------------- z <y/n> enter\n\n\n");
-	
-	/*status information*/
-	if (control.function | 0xFFFE == 0xFFFF) {
-		printf("\t!!!! SYSTEM ERROR - STOPPING LIFT !!!!\n");
-		printf("\tIf system is ok press reset <r>\n");
-	
-	} else {
-		switch (control.function | 0xFFF9) {
-			case 0xFFF9:
+
+	if (updated ==1) {
+		printf("\n\n\n_Key Commands________________________________\n");
+		printf("| START/STOP ---------------- spacebar\n");
+		printf("| change direction ---------- d\n");
+		printf("| adjust lift rate ---------- l <rate> enter\n");
+		printf("| momentary lift ------------ m\n\n");
+		if (lift_flag == LOWER)
+			printf(" Lowering mode active\n\n");
+		else
+			printf(" Lifting mode active\n\n");
+		switch (control.function & 0x3) {
+			case 0x0:
 				printf(" Status: ...holding load\n");
 				break;
 			
-			case 0xFFFB:
+			case 0x1:
 				printf(" Status: ...lifting\n");
 				break;
 				
-			case 0xFFFD:
+			case 0x2:
 				printf(" Status: ...lowering\n");
 		}
 	}
+
+	//FIXME this needs to be updated on analysis of contingency routing
+	if ((control.function & 0x1) == 0x1) {
+		printf("\t!!!! SYSTEM ERROR - STOPPING LIFT !!!!\n");
+		printf("\tcheck system for problems\n");
+		printf("\tIf system is ok press reset <r>\n");
+	}
+		
 	
 	/*user input*/
 	if (kbhit() != 0) {
@@ -119,7 +174,7 @@ int UI(int mode)
 						if (lift_flag == LIFT)
 							ui.function = (ui.function + 0x2);
 						else
-							ui.function = (ui.function + 0x6);
+							ui.function = (ui.function + 0x4);
 						break;
 					
 					case 0x2:
@@ -132,15 +187,17 @@ int UI(int mode)
 						lift_flag = LOWER;
 				}
 				break;
+
+			case 'd': //change direction
+				lift_flag = (lift_flag & (lift_flag++));
+				break;
 			
 			case 'l': //adjust rate
 				break;
 			
 			case 'm': //momentary lift FIXME structures non-supportive
 				break;
-			
-			case 'z': //zero location
-				break;
+	
 		}
 	}
 	return;

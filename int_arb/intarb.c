@@ -26,11 +26,12 @@
 
 #include<stdio.h>
 #include<unistd.h>
-//#include"include/intarb.h"
 #include"../include/control_str.h"
+#include"include/intarb.h"
 
 #define INIT 1
 #define NORM 0
+#define CONT 2
 #define MAX_ADDRESSABLE 255
 
 /*declarations*/
@@ -42,14 +43,30 @@ int jack_lookup_table[MAX_ADDRESSABLE];
 int ui_flag;
 int ini_flag = 0;
 
-int Arbitor(struct status_t local_status, struct cnt_template_t *local)
+int Arbitor(struct status_t *local_status, struct cnt_template_t *local)
 {
 	int ret;
 	
-	if (ini_flag == 0) {
+	/*contingency router*/
+	if ((local->function & 0x01) == 0x1) {
+	    if (h_status == 1) {
+	        Master(local);    
+	        UI(CONT);  
+	        local->function = (local->function + 0x10);\
+	        Master(local); //FIXME assume global recovery or request statuses?
+	        local->function = 0;
+	    } else {
+	        Slave(local);
+	        local->function = 0;
+	    }
+	    return 0;
+	}
+	
+	/*initialize*/
+	if (local->function == 0x80) {
 		printf("Initializing network...  ");
 		ret = Elections();
-		if (ret = 0) {
+		if (ret == 0) {
 			printf("FAILURE!!!\nactive jacks detected: %i\n", active);
 			printf("check connections and restart system\n\n");
 			return -1; //FIXME this needs to return something coherent
@@ -57,21 +74,25 @@ int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 		printf("active jacks on system: %i\n", active);
 
 		if (h_status == 1) {
-			UI(INIT);
+			//UI(INIT);FIXME we dont want nonblock yet
+		
 		}
 		ini_flag = 1;
 		return;
 	}
 	
 	/*push local jack status to array*/
-	status_table[0] = local_status;
+	status_table[0] = *local_status;
 	//FIXME needs .function to be locally populated
 	
 	/*normal int/arb operations*/
 	
 	/*master*/
 	if (h_status == 1) {
-		UI(NORM); //FIXME only update every x loops
+		if ((local->function & 0x6) > 0)
+			UI(LOC_ACTIVE);
+		else
+			UI(LOC_STOP);
 		ret = Master(local);
 		if (ret < 0) {
 			printf("master routine error, calling contingency.");
@@ -84,8 +105,8 @@ int Arbitor(struct status_t local_status, struct cnt_template_t *local)
 		if (ret < 0) {
 			//printf("slave routine error, calling contingency.");
 			return -1;
-		}
-		
+		} else if (ret == 2)
+			local_status->offset = local_status->elevation;
 	} else {
 		printf("h_status variable out of bounds, please panic.");
 		return 0; //FIXME returning normal, should this condition cause cont?

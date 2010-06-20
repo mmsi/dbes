@@ -6,17 +6,17 @@
 srcdir = $(PRJROOT)
 
 #Tool names
-CROSS_COMPILE   = ${TARGET_PREFIX}-
+CROSS_COMPILE   			= ${TARGET_PREFIX}-
 AS                          = $(CROSS_COMPILE)as
 AR                          = $(CROSS_COMPILE)ar
 CC                          = $(CROSS_COMPILE)gcc
-CPP                        = $(CC) -E
+CPP                       	= $(CC) -E
 LD                          = $(CROSS_COMPILE)ld
 
 export AS AR CC CPP LD
 
 #Build settings
-CFLAGS                  = -I$(srcdir)/include -mcpu=arm9 -Wall
+CFLAGS                  = -I$(srcdir)/include -mcpu=arm9 -Wall -g
 export CFLAGS
 export srcdir
 

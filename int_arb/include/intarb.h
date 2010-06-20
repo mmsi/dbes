@@ -24,6 +24,15 @@
 
 #define MAX_ADDRESSABLE 255
 
+/*ui modes*/
+#define NORM 	        0
+#define INIT 	        1 //deprecated
+#define CONT 	        2
+#define LOC_ACTIVE		3
+#define LOC_STOP		4
+/*ui return*/
+#define ZERO			2
+
 /*external control information*/
 extern struct cnt_template_t control;
 
@@ -38,7 +47,7 @@ extern int active;
 extern int jack_lookup_table[];
 
 /*local ui 1=local, 0=remote*/
-extern int ui_flag;
+extern int ui_flag; //depracated
 
 /*Int/Arb initialization*/
 extern int ini_flag; //FIXME why is this extern?

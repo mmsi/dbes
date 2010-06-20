@@ -37,17 +37,19 @@
 #define FILTER 4
 
 /*max number of CAN data bytes*/
-#define MSG_LENGTH 6
+#define MSG_LENGTH 7
 
 /*message id*/
-#define MASTER_PING 0  //no data
-#define CONTROL 1	   //5 bytes
-#define BROAD_ID 2	   //byte 0
-#define CONT 3		   //no data
-#define STATUS_REQ 4   //byte 0
-#define STATUS 5	   //6 bytes - note exception
-#define UIPASS 6	   //5 bytes
-#define PING_REPLY 7   //no data
+#define MASTER_PING			10  //no data
+#define CONTROL				1	   //5 bytes
+#define BROAD_ID			2	   //byte 0
+#define CONT				3		   //no data
+#define STATUS_REQ			4   //byte 0
+#define STATUS				5	   //6 bytes - note exception
+#define UIPASS				6	   //5 bytes
+#define PING_REPLY			7   //no data
+#define CONT_RECOV			8   //no data
+#define ZERO				9
 
 //FIXME add defines for return conditions
 

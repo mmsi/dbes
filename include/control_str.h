@@ -26,12 +26,13 @@
 /**
  *cnt_template_t
  *unsigned short function		address and/or other information
- *		bit 0			contingency flag
- *		bits 1,2		lift - 00: idle, 01: lift, 10: lower
- *		bit 3			control flag - 0: auto, 1: manual
- *		bits 4-6		undefined
- *		bit 7			init flag
- *		byte 1			jack id
+ *		bit 0			       contingency flag
+ *		bits 1,2		   lift - 00: idle, 01: lift, 10: lower
+ *		bit 3			       control flag - 0: auto, 1: manual
+ *     bit 4                contingency recovery
+ *		bits 5,6		   undefined
+ *		bit 7			       init flag
+ *		byte 1			   jack id
  *unsigned short dest			destination height
  *unsigned char rate			lifting rate - raw linear 0-255
  */
@@ -45,8 +46,8 @@ struct cnt_template_t {
 
 /**
  *status_t
- *unsigned char function		undefined
  *unsigned short elevation		elevation
+ *unsigned short offset			elevation zero offset
  *unsigned short pressure		pressure transducer
  *unsigned char d_input			button and limit switches
  *		bit 0			e-stop
@@ -59,8 +60,8 @@ struct cnt_template_t {
 
 /*individual jack status type*/
 struct status_t {
-	unsigned char function;
 	unsigned short elevation;
+	unsigned short offset;
 	unsigned short pressure;
 	unsigned char d_input;
 };
@@ -70,3 +71,6 @@ extern int devmem;
 
 /*hierarchy status on system*/
 extern int h_status;
+
+/*local jack address*/
+extern char local_id;

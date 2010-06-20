@@ -65,7 +65,7 @@ int Driver(unsigned char com, unsigned char *msg_data, unsigned long *msg_id)
 		case 2: //send FIXME check if successful
 		    message.flags &= ~MSG_EXT;
 			message.id = *msg_id;
-			for (i=0; i<5; i++) {
+			for (i=0; i<6; i++) {
 				message.data[i] = *(msg_data + i);
 			}
 			ret = write(fd, &message, sizeof(struct canmsg_t));

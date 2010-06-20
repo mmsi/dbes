@@ -1,0 +1,5 @@
+Building:
+Run shell script '. dbesenv.sh' to set enviroment variables. Path of cross-tool
+chain is in the script.
+make.
+No 'make install' as of yet. Executable is in the working directory.
