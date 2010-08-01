@@ -61,7 +61,7 @@ int UI(int mode)
 	/*1=auto*/
 	static int block_status, updated;
 	float total_weight;
-	static struct time_t updatetv;
+	static time_t updatetv;
 	
 	if (mode == INIT) //deprecated
 		return 0;
@@ -92,8 +92,8 @@ int UI(int mode)
 		for (i = 0; i == active; i++) {
 			total_weight = (total_weight + (status_table[i].pressure * CYL_AREA));
 		}
-		printf("\n\n Total Weight: %5.1f\t\tLift Rate: %u in/min\t\tDestination:\
-			   %u inches", total_weight, control.rate, control.dest);
+		printf("\n\n Total Weight: %5.1f\t\tLift Rate: %u", total_weight, control.rate);
+		printf(" in/min\t\tDestination: %u inches", control.dest);
 		time(&updatetv);
 		updated = 1;
 	} else
@@ -116,15 +116,17 @@ int UI(int mode)
 						Nonblock(NB_DISABLE);
 						//FIXME flush stdin
 						printf("set system to zero? <y/n>\n");
-						while ((c = getchar()) != ('y' || 'n'))
-						if (c == 'y') {
-							Nonblock(NB_ENABLE);
-							ui.function = (ui.function & 0x20);
-							return ;
-						} else {
-							Nonblock(NB_ENABLE);
-							break;
-						}
+						do {
+							c = getchar();
+							if (c == 'y') {
+								Nonblock(NB_ENABLE);
+								ui.function = (ui.function & 0x20);
+								return ;
+							} else if (c == 'n') {
+								Nonblock(NB_ENABLE);
+								break;
+							}
+						} while ((c != 'y') && (c != 'n'));
 					case SPACE:
 						ui.function = (ui.function - 0x8);
 				}
@@ -133,12 +135,12 @@ int UI(int mode)
 		}
 	}
 
-	if (updated ==1) {
+	if (updated == 1) {
 		printf("\n\n\n_Key Commands________________________________\n");
 		printf("| START/STOP ---------------- spacebar\n");
 		printf("| change direction ---------- d\n");
 		printf("| adjust lift rate ---------- l <rate> enter\n");
-		printf("| momentary lift ------------ m\n\n");
+		printf("| enter manual control ------ m\n\n");
 		if (lift_flag == LOWER)
 			printf(" Lowering mode active\n\n");
 		else
@@ -189,13 +191,14 @@ int UI(int mode)
 				break;
 
 			case 'd': //change direction
-				lift_flag = (lift_flag & (lift_flag++));
+				lift_flag = ((~lift_flag) & 0x1);
 				break;
 			
 			case 'l': //adjust rate
 				break;
 			
-			case 'm': //momentary lift FIXME structures non-supportive
+			case 'm': //manual control
+				ui.function = 0x8;
 				break;
 	
 		}

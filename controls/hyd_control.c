@@ -44,20 +44,20 @@ int Hyd_Control(struct cnt_template_t control)
 	}
 	
 	switch (control.function & 0x0006) {
-		case 0:
+		case 0x0:
 			Dout(MASTER, OFF);
 			Dout(CHECK, OFF);
 			PWM(0, 1);
 			break;
 			
-		case 2: //lift
+		case 0x2: //lift
 			Dout(MASTER, ON);
 			Dout(CHECK, OFF);
 			Dout(LIFT, ON);
 			PWM(control.rate, 2); //FIXME implement dither here
 			break;
 			
-		case 4: //lower
+		case 0x4: //lower
 			Dout(MASTER, ON);
 			Dout(CHECK, ON);
 			Dout(LIFT, OFF);

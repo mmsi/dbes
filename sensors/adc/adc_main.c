@@ -26,6 +26,7 @@
 #include<stdio.h>
 #include<sys/mman.h>
 #include<control_str.h>
+#include<unistd.h>
 #include"peekpoke_dbes.h"
 //#include"eeprog_dbes.h"
 #include"ep93xx_adc_dbes.h"

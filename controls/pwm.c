@@ -24,6 +24,7 @@
  
 #include<stdio.h>
 #include<sys/mman.h>
+#include<unistd.h>
 #include"../include/control_str.h"
 
 #define XDIO_PAGE 0x12C00000
@@ -38,7 +39,7 @@
  */
 int PWM(unsigned char rate, int mode)
 {
-	static unsigned int *xdio_mode, *pwm_msbs, *pwm_high_lsb, *pwm_low_lsb;
+	static unsigned char *xdio_mode, *pwm_msbs, *pwm_high_lsb, *pwm_low_lsb;
 	unsigned char *start;
 	unsigned short rate_s;
 	
@@ -47,13 +48,13 @@ int PWM(unsigned char rate, int mode)
 			start = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
 						 devmem, XDIO_PAGE);
 			/*offsets*/
-			xdio_mode = (unsigned int *)(start + REG_0);
-			pwm_msbs = (unsigned int *)(start + REG_1);
-			pwm_high_lsb = (unsigned int *)(start + REG_2);
-			pwm_low_lsb = (unsigned int *)(start + REG_3);
+			xdio_mode = (start + REG_0);
+			pwm_msbs = (start + REG_1);
+			pwm_high_lsb = (start + REG_2);
+			pwm_low_lsb = (start + REG_3);
 			
 			/*set xdio control mode*/
-			*xdio_mode =  0xC3;
+			*xdio_mode =  0xC1;
 			break;
 			
 		case 1: //off
@@ -66,14 +67,13 @@ int PWM(unsigned char rate, int mode)
 			
 			/*set rate*/
 			rate_s = ((unsigned short)rate * 16);
-			*pwm_high_lsb = (rate_s & 0xFF);
-			*pwm_msbs = (((rate_s & 0xF00) >> 4)+(((0xFFF - rate_s)\
+			*pwm_high_lsb = (char)(rate_s & 0xFF);
+			*pwm_msbs = (char)(((rate_s & 0xF00) >> 4)+(((0xFFF - rate_s)\
 												   & 0xF00) >> 8));
-			*pwm_low_lsb = ((0xFFF - rate_s) & 0xFF);
+			*pwm_low_lsb = (char)((0xFFF - rate_s) & 0xFF);
 
 			/*enable*/
-			if ((*xdio_mode & 0x2) == 2)
-				*xdio_mode = (*xdio_mode + 0x2);
+			*xdio_mode = (*xdio_mode | 0x2);
 	}
 	
 	return 0;

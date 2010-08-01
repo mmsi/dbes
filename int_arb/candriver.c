@@ -30,6 +30,7 @@
 #include<stdio.h>
 #include<sys/ioctl.h>
 #include<fcntl.h>
+#include<unistd.h>
 #include"include/can.h"
 
 //The read() gets the full message and puts it in a canmsg_t

@@ -27,11 +27,11 @@
 /*ui modes*/
 #define NORM 	        0
 #define INIT 	        1 //deprecated
-#define CONT 	        2
+#define CONTIN 	        2
 #define LOC_ACTIVE		3
 #define LOC_STOP		4
 /*ui return*/
-#define ZERO			2
+#define UI_ZERO			2
 
 /*external control information*/
 extern struct cnt_template_t control;

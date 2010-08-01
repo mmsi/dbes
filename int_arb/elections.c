@@ -68,7 +68,7 @@ int JackDatabase()
 		printf("CAN error...\n");
 	//	return 0;
 
-	do {
+	do { //FIXME need to pause within this loop to allow all jacks to respond
 		ret = Driver(RX, &e_message_array[0], &e_msg_id);
 		if (ret != 0)
 			printf("CAN error...\n");
@@ -82,7 +82,7 @@ int JackDatabase()
 				i = 0;
 				do {
 					if (e_message_array[0] == jack_lookup_table[i]) {
-						break; //FIXME can i break out this deeply nested?
+						break;
 					}
 					i++;
 				} while(jack_lookup_table[i] != 0);
