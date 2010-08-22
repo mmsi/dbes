@@ -58,6 +58,9 @@ int PWM(unsigned char rate, int mode)
 			break;
 			
 		case 1: //off
+			*pwm_high_lsb = 0x00;
+			*pwm_msbs = 0x0F;
+			*pwm_low_lsb = 0xFF;
 			*xdio_mode = (*xdio_mode & 0xFD);
 			break;
 			

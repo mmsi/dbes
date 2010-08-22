@@ -66,19 +66,19 @@ int Arbitor(struct status_t *local_status, struct cnt_template_t *local)
 	if (local->function == 0x80) {
 		printf("Initializing network...  ");
 		ret = Elections();
-		if (ret == 0) {
-			printf("FAILURE!!!\nactive jacks detected: %i\n", active);
-			printf("check connections and restart system\n\n");
-			return -1; //FIXME this needs to return something coherent
-		}
-		printf("active jacks on system: %i\n", active);
-
 		if (h_status == 1) {
-			//UI(INIT);FIXME we dont want nonblock yet
-		
-		}
+			ret = JackDatabase();
+			if (ret < 0) {
+				printf("FAILURE!!!\nactive jacks detected: %i\n", active);
+				printf("check connections and restart system\n\n");
+				return -1; //FIXME this needs to return something coherent
+			}
+			printf("active jacks on system: %i\n", active);
+		} else {
+			Broadcast();
+		}	
 		ini_flag = 1;
-		return;
+		return 0;
 	}
 	
 	/*push local jack status to array*/

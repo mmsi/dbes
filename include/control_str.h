@@ -50,10 +50,10 @@ struct cnt_template_t {
  *unsigned short offset			elevation zero offset
  *unsigned short pressure		pressure transducer
  *unsigned char d_input			button and limit switches
- *		bit 0			e-stop
- *		bit 1			up button
- *		bit 2			down button
- *		bit 3			cylinder extend limit switch
+ *		bit 0			down button
+ *		bit 1			n/a
+ *		bit 2			n/a
+ *		bit 3			up button
  *		bit 4			tilt interlock switch
  *		bits 5-7		undefined
  */

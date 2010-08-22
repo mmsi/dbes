@@ -43,12 +43,12 @@ int Master(struct cnt_template_t *local)
 	    /*recovery bit check*/
 	    if ((local->function & 0x11) == 0x11) {
 	        m_msg_id = CONT_RECOV;
-	        if (Driver(TX, &m_message_array[0], &m_msg_id) != 0)
+	        if (Driver(CAN_TX, &m_message_array[0], &m_msg_id) != 0)
 	            return -1;
 	        return 0;
 		} else {
     		m_msg_id = CONT;
-	    	if (Driver(TX, &m_message_array[0], &m_msg_id) != 0) //FIXME need handlers
+	    	if (Driver(CAN_TX, &m_message_array[0], &m_msg_id) != 0) //FIXME need handlers
 	    	//for different errors and return codes
 	    		return -1;
     		return 0;
@@ -60,20 +60,20 @@ int Master(struct cnt_template_t *local)
 
 	if ((control.function & 0x20) == 0x20) {
 		m_msg_id = ZERO;
-		if (Driver(TX, &m_message_array[0], &m_msg_id) != 0)
+		if (Driver(CAN_TX, &m_message_array[0], &m_msg_id) != 0)
 			return -1;
 		control.function = (control.function - 0x20);
 	}
 
 	do {
-		ret = Driver(RX, &m_message_array[0], &m_msg_id);
+		ret = Driver(CAN_RX, &m_message_array[0], &m_msg_id);
 		if (ret != 0)
 			return -1;
 		switch (m_msg_id) {
 			case MASTER_PING: //master ping
 				m_msg_id = PING_REPLY;
 				m_message_array[0] = 0;
-				ret = Driver(TX, &m_message_array[0], &m_msg_id);
+				ret = Driver(CAN_TX, &m_message_array[0], &m_msg_id);
 				break;
 
 			case CONT: //contingency broadcast
@@ -122,7 +122,7 @@ int Master(struct cnt_template_t *local)
 		m_message_array[4] = control.rate;
 		m_msg_id = CONTROL;
 
-		ret = Driver(TX, &m_message_array[0], &m_msg_id);
+		ret = Driver(CAN_TX, &m_message_array[0], &m_msg_id);
 		if (ret != 0)
 			return -1;
 		cnt_update = 0;
@@ -147,7 +147,7 @@ int StatusScheduler()
 	if (i>=MAXSTAT) {
 		m_message_array[0] = jack_lookup_table[id];
 		m_msg_id = 4;
-		ret = Driver(TX, &m_message_array[0], &m_msg_id);
+		ret = Driver(CAN_TX, &m_message_array[0], &m_msg_id);
 		if (ret != 0)
 			return -1;
 		i = 0;

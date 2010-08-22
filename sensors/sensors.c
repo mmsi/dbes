@@ -31,7 +31,7 @@
 #define POS 		0
 #define PRES		1
 
-int adc_result;
+unsigned long adc_result;
 
 int Sensors(int mode, struct status_t *sensor_data)
 {
@@ -51,9 +51,9 @@ int Sensors(int mode, struct status_t *sensor_data)
 		printf("Sensors successfully initialized...\n");
 
 		ADC(PR_TRANS, &adc_result);
-		printf("raw pressure transducer value: %X\n", adc_result);
+		printf("raw pressure transducer value: %X\n", (unsigned int)adc_result);
 		ADC(CET, &adc_result);
-		printf("raw cable extension transducer value: %X\n", adc_result);
+		printf("raw cable extension transducer value: %X\n", (unsigned int)adc_result);
 		return 0;
 	}
 	
@@ -65,8 +65,8 @@ int Sensors(int mode, struct status_t *sensor_data)
 	if (ADC(PR_TRANS, &adc_result) != 0) {
 		printf("ADC read error");
 	} else {
-		/*convert to PSI*/ //FIXME add conversion alorithm
-		sensor_data->pressure = adc_result; //FIXME will this correctly cast a int into a short?
+		/*convert to psi*/ //FIXME
+		sensor_data->pressure = (unsigned short)adc_result;
 	}
 	
 	/*elevation*/
@@ -74,7 +74,7 @@ int Sensors(int mode, struct status_t *sensor_data)
 		printf("ADC read error");
 	} else {
 		/*convert to inches*/ //FIXME add conversion alorithm
-		sensor_data->elevation = adc_result;
+		sensor_data->elevation = (unsigned short)adc_result;
 	}
 	return 0;
 }
@@ -83,10 +83,10 @@ int Sensor_cal(int mode)
 {
 	if (mode == POS) {
 		ADC(CET, &adc_result);
-		return adc_result;
+		return (int)adc_result;
 	} else if (mode == PRES) {
 		ADC(PR_TRANS, &adc_result);
-		return adc_result;
+		return (int)adc_result;
 	} else
 		return (DI(1));
 }

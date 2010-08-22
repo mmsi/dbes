@@ -79,7 +79,7 @@ int read_channel(unsigned long adc_page, unsigned short channel)
 	POKE32(adc_page + ADCSWLOCK_OFFSET, UNLOCK_VAL); //unlock the soft lock
 
 	//write ADCSwitch reg to select channel
-	POKE32(adc_page + ADCSWITCH_OFFSET, channel);
+	POKE32(adc_page + ADCSWITCH_OFFSET, (unsigned long)channel);
 
 	while(is_ADC_busy(adc_page)); //poll ADCResult
 

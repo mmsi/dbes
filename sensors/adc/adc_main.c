@@ -33,10 +33,10 @@
 
 static unsigned long adc_page, syscon_page;
 
-int ADC(unsigned short channel, int *result)
+int ADC(unsigned short channel, unsigned long *result)
 {
-	static int init = 0;
-	int i, adc_result[5];
+	int i;
+	unsigned long adc_result[5];
 	
 	/*initialization*/
 	if (channel == 0) {
@@ -58,21 +58,32 @@ int ADC(unsigned short channel, int *result)
 		init_ADC(adc_page, syscon_page);
 		return 0;
 	}
-	
+
+	*result = 0;
+
 	/*read adc channel*/
 	read_channel(adc_page, channel);
 	
 	read_channel(adc_page, channel);
 	
 	for (i = 0; i < 5; i++) {
-		//usleep(); delay if needed
+		//sleep(1);
 		adc_result[i] = read_channel(adc_page, channel);
+		//printf("%i\n", (int)adc_result[i]);
 	}
 	
 	/*average*/
 	for (i = 0; i < 5; i++) {
 		*result = (*result + adc_result[i]);
+		//printf("%i\n", (int)(*result));
 	}
 	*result = (*result / 5);
+
+	if (*result < 0x7000)
+		*result = *result + 0x10000;
+
+	/*insure value is < 0xFFFF*/
+	*result = *result / 4;
+
 	return 0;
 }

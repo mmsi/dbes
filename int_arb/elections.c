@@ -36,6 +36,7 @@
 #define PING_WAIT 2
 
 int JackDatabase();
+int Broadcast(void);
 
 char e_message_array[MSG_LENGTH];
 unsigned long e_msg_id;
@@ -45,11 +46,10 @@ int master_flag;
 /*return: 0=error, 1=slave, 2=master*/
 int Elections()
 {
-	int i = 0;
 	int ret;
 
 	/*initialize CAN*/
-	ret = Driver(INI, &e_message_array[0], &e_msg_id);
+	ret = Driver(CAN_INI, &e_message_array[0], &e_msg_id);
 
 	return 1;
 }
@@ -58,18 +58,13 @@ int JackDatabase()
 {
 	int i;
 	int ret;
-	
-	/*broadcast id*/
-	printf("broadcasting id...\n");
-	e_message_array[0] = UNIQ_ID;
-	e_msg_id = BROAD_ID;
-	ret = Driver(TX, &e_message_array[0], &e_msg_id);
-	if (ret != 0)
-		printf("CAN error...\n");
-	//	return 0;
+
+	jack_lookup_table[0] = local_id;
+	active++;
+	printf("local id = %i\n", local_id);
 
 	do { //FIXME need to pause within this loop to allow all jacks to respond
-		ret = Driver(RX, &e_message_array[0], &e_msg_id);
+		ret = Driver(CAN_RX, &e_message_array[0], &e_msg_id);
 		if (ret != 0)
 			printf("CAN error...\n");
 		//	return 0;
@@ -78,18 +73,32 @@ int JackDatabase()
 				master_flag = 1;
 				break;
 
-			case 2: //build database of jacks on net
+			case BROAD_ID: //build database of jacks on net
 				i = 0;
-				do {
+				do { //walk the jack table
 					if (e_message_array[0] == jack_lookup_table[i]) {
 						break;
 					}
 					i++;
 				} while(jack_lookup_table[i] != 0);
-				printf("found jack #%i\n", jack_lookup_table[i]);
+				printf("found jack #%i", jack_lookup_table[i]);
+				printf("   jack address: %i\n", e_message_array[0]);
 				jack_lookup_table[i] = e_message_array[0];
 				active++;
+				e_msg_id = ACK_ID;
+				Driver(CAN_TX, &e_message_array[0], &e_msg_id);
 		}	
 	} while(e_message_array[0] != 0);
-	return;
+	return 0;
+}
+
+int Broadcast(void)
+{
+	do {
+		e_message_array[0] = local_id;
+		e_msg_id = BROAD_ID;
+		Driver(CAN_TX, &e_message_array[0], &e_msg_id);
+		sleep(1);
+		Driver(CAN_RX, &e_message_array[0], &e_msg_id);
+	} while ((e_msg_id != ACK_ID) && (e_message_array[0] != local_id));
 }

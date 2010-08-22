@@ -32,16 +32,17 @@
 #include<unistd.h>
 #include"include/control_str.h"
 
-#define DIO_PAGE     0x80840000
-#define JUMPER_PAGE  0x22800000
-#define POS			 0
-#define PRES		 1
+#define DIO_PAGE     	0x80840000
+#define JUMPER6_PAGE	0x22800000
+#define JUMPER_PAGE		0x10800000
+#define POS			 	0
+#define PRES		 	1
 
 /*configuration file name*/
 #define CONFIG_NAM "config"
 
 /*length of configuration file (characters)*/
-#define MAX_CONFIG 27
+#define MAX_CONFIG 29
 
 /*prototypes*/
 int MainLoop();
@@ -58,8 +59,9 @@ char local_id = 0;
 
 int main()
 {
-	int i, c;
+	int i, c, man_status;
 	char *jump6;
+	char *jump;
 	FILE *fp;
 
 	devmem = open("/dev/mem", O_RDWR|O_SYNC);
@@ -68,17 +70,40 @@ int main()
 	start = mmap(0, 4096, PROT_READ|PROT_WRITE, MAP_SHARED,
 				 devmem, DIO_PAGE);
 	jump6 = mmap(0, 4096, PROT_READ|PROT_WRITE, MAP_SHARED,
-				devmem, JUMPER_PAGE);
+				devmem, JUMPER6_PAGE);
+	jump = mmap(0, 4096, PROT_READ|PROT_WRITE, MAP_SHARED,
+	    		devmem, JUMPER_PAGE);
 
+	man_status = (*jump & 0x10);
 	h_status = (*jump6 & 0x1);
 	printf("initializing sensors...\n");
 	Sensors(0);
 	local_control.function = 0x0080;
 	printf("initializing controls...\n");
 	Hyd_Control(local_control);
-	printf("initializing interface/arbitration...\n");
-	Arbitor(&status, &local_control);
 
+	if (man_status == 0) {
+		local_control.function = 0x0;
+		printf("Entering Manual Test Mode\n\nto view sensor information ");
+		printf("leave a console connected\nthis is not an interactive session");
+		printf("\nto exit this mode power down and remove jumper 5\n");
+		printf("Happy Trials To You\n");
+		sleep(3);
+		local_control.rate = 255;
+		while (1) {
+			Sensors(1, &status);
+			printf("pressure: %u height: %u", status.pressure, status.elevation);
+			printf(" buttons: %X\n", status.d_input);
+			if ((status.d_input & 0x8) == 0x0)
+			    local_control.function = 0xA;
+			else if ((status.d_input & 0x1) == 0x0)
+			    local_control.function = 0xC;
+			else
+				local_control.function = 0x8;
+			Hyd_Control(local_control);
+		}
+	}
+		
 	/*configuration prompt*/
 	if (h_status == 1 ) {
 		/*master*/
@@ -112,6 +137,8 @@ int main()
 
 	bypass:
 	local_id = (calib[0]*100) + (calib[1]*10) + calib[2];
+	printf("initializing interface/arbitration...\n");
+	Arbitor(&status, &local_control);
 	/*clear init*/
 	local_control.function = 0x0000;
 
@@ -219,7 +246,7 @@ void Configuration(void)
 	getline(&line, &len, stdin);
 	raw = Sensor_cal(PRES);
 	printf("zero set at %u\n", raw);
-	fprintf(fp, "%4u", raw);
+	fprintf(fp, "%5u", raw);
 
 	/*scale*/
 	printf("disconnect return hose\n");
@@ -243,7 +270,7 @@ void Configuration(void)
 	Hyd_Control(local_control);
 	raw = Sensor_cal(POS);
 	printf("\nzero at %u\n", raw);
-	fprintf(fp, "%4u", raw);
+	fprintf(fp, "%5u", raw);
 
 	/*scale*/
 	printf("press enter when height is 24 to 36 inches\n");

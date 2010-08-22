@@ -39,7 +39,7 @@ int Hyd_Control(struct cnt_template_t control)
 		Dout(MASTER, OFF);
 		Dout(CHECK, OFF);
 		PWM(0, 1);
-		Dout(LIGHT, ON);
+		Dout(AUX_PWM, OFF);
 		return 0;
 	}
 	
@@ -47,6 +47,7 @@ int Hyd_Control(struct cnt_template_t control)
 		case 0x0:
 			Dout(MASTER, OFF);
 			Dout(CHECK, OFF);
+			Dout(AUX_PWM, OFF);
 			PWM(0, 1);
 			break;
 			
@@ -54,6 +55,7 @@ int Hyd_Control(struct cnt_template_t control)
 			Dout(MASTER, ON);
 			Dout(CHECK, OFF);
 			Dout(LIFT, ON);
+			Dout(AUX_PWM, ON);
 			PWM(control.rate, 2); //FIXME implement dither here
 			break;
 			
@@ -61,6 +63,7 @@ int Hyd_Control(struct cnt_template_t control)
 			Dout(MASTER, ON);
 			Dout(CHECK, ON);
 			Dout(LIFT, OFF);
+			Dout(AUX_PWM, ON);
 			PWM(control.rate, 2);
 	}
 	return 0;

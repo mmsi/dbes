@@ -30,14 +30,14 @@
  */
 
 /*driver control defines*/
-#define INI 0
-#define RX 1
-#define TX 2
-#define CLOSE 3
-#define FILTER 4
+#define CAN_INI		0
+#define CAN_RX		1
+#define CAN_TX		2
+#define CAN_CLOSE	3
+#define CAN_FILTER	4
 
 /*max number of CAN data bytes*/
-#define MSG_LENGTH 7
+#define MSG_LENGTH	7
 
 /*message id*/
 #define MASTER_PING			10  //no data
@@ -50,7 +50,8 @@
 #define PING_REPLY			7   //no data
 #define CONT_RECOV			8   //no data
 #define ZERO				9
+#define ACK_ID				11	//1 byte - address
 
 //FIXME add defines for return conditions
 
-int Driver(unsigned char, char *, unsigned long *);
+//int Driver(unsigned char, char *, unsigned long *);

@@ -51,5 +51,5 @@ int DI(mode)
 		return 0;
 	}
 	
-	return (*padr);
+	return (~(*padr));
 }

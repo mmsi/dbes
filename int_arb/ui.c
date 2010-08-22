@@ -169,7 +169,7 @@ int UI(int mode)
 	
 	/*user input*/
 	if (kbhit() != 0) {
-		switch (fgetc(stdin)) {
+		switch (getchar()) {
 			case SPACE:
 				switch (control.function & 0x6) {
 					case 0x0:
@@ -231,6 +231,7 @@ void Nonblock(int state)
 		ttystate.c_lflag &= ~ICANON;
         //minimum of number input read.
         ttystate.c_cc[VMIN] = 1;
+		ttystate.c_cc[VTIME] = 2;
     } else if (state==NB_DISABLE) {
 		//turn on canonical mode
         ttystate.c_lflag |= ICANON;

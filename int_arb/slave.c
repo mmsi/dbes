@@ -36,20 +36,20 @@ int Slave(struct cnt_template_t *local)
 	    /*recovery*/
 	    if ((local->function & 0x11) == 0x11) {
 	    	do {
-	    		if (Driver(RX, &s_message_array[0], &s_msg_id) != 0)
+	    		if (Driver(CAN_RX, &s_message_array[0], &s_msg_id) != 0)
 	    			return -1;
 	    	} while (s_msg_id != CONT);
 		return 0;
 		}
 		s_msg_id = CONT;
-		if (Driver(TX, &s_message_array[0], &s_msg_id) != 0)
+		if (Driver(CAN_TX, &s_message_array[0], &s_msg_id) != 0)
 			return -1;
 		return 0;
 	}
 		
 	/*normal slave operations*/
 	do {
-		ret = Driver(RX, &s_message_array[0], &s_msg_id);
+		ret = Driver(CAN_RX, &s_message_array[0], &s_msg_id);
 		if (ret != 0)
 			return -1;
 		switch (s_msg_id) {
@@ -69,7 +69,7 @@ int Slave(struct cnt_template_t *local)
 				s_message_array[5] = (status_table[0].pressure >> 8);
 				s_message_array[6] = (char) status_table[0].pressure;
 				s_msg_id = STATUS;
-				if (Driver(TX, &s_message_array[0], &s_msg_id) != 0)
+				if (Driver(CAN_TX, &s_message_array[0], &s_msg_id) != 0)
 					return -1;
 				break;
 			case ZERO:

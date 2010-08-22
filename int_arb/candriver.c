@@ -32,6 +32,7 @@
 #include<fcntl.h>
 #include<unistd.h>
 #include"include/can.h"
+#include"include/candriver.h"
 
 //The read() gets the full message and puts it in a canmsg_t
 //any unneedded bytes are just abandoned
@@ -43,15 +44,15 @@ int Driver(unsigned char com, unsigned char *msg_data, unsigned long *msg_id)
 	struct canmsg_t message;
 
 	switch (com) {
-		case 0: //ini
-			fd = open(specialfile, O_RDWR);
+		case CAN_INI: //ini
+			fd = open(specialfile, O_RDWR|O_NONBLOCK);
 			if (fd<0) {
 				printf("Error opening %s\n", specialfile);
 				return 1;
 			}
 			return 0;
 
-		case 1: //receive
+		case CAN_RX: //receive
 			ret = read(fd, &message, sizeof(struct canmsg_t));//FIXME needs nonblock
 			if (ret<0)
 				return 3;
@@ -63,7 +64,7 @@ int Driver(unsigned char com, unsigned char *msg_data, unsigned long *msg_id)
 			}
 			return 0;
 
-		case 2: //send FIXME check if successful
+		case CAN_TX: //send FIXME check if successful
 		    message.flags &= ~MSG_EXT;
 			message.id = *msg_id;
 			for (i=0; i<6; i++) {
@@ -75,7 +76,7 @@ int Driver(unsigned char com, unsigned char *msg_data, unsigned long *msg_id)
 			else
 				return 0;
 		
-		case 3:
+		case CAN_CLOSE:
 		    close(fd);
 		    return 0;
 		    
