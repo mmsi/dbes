@@ -34,6 +34,10 @@
 #include"include/can.h"
 #include"include/candriver.h"
 
+#define CAN_WAIT_USEC 5
+
+int can_fd_wait(int, int);
+
 //The read() gets the full message and puts it in a canmsg_t
 //any unneedded bytes are just abandoned
 int Driver(unsigned char com, unsigned char *msg_data, unsigned long *msg_id)
@@ -53,13 +57,16 @@ int Driver(unsigned char com, unsigned char *msg_data, unsigned long *msg_id)
 			return 0;
 
 		case CAN_RX: //receive
-			ret = read(fd, &message, sizeof(struct canmsg_t));//FIXME needs nonblock
-			if (ret<0)
-				return 3;
-			else {
-				*msg_id = message.id;
-				for (i=0; i<message.length; i++) {
-					*(msg_data + i) = message.data[i];
+			ret = can_fd_wait(fd, CAN_WAIT_USEC);
+			if (ret == 1) {
+				ret = read(fd, &message, sizeof(struct canmsg_t));
+				if (ret<0)
+					return 3;
+				else {
+					*msg_id = message.id;
+					for (i=0; i<message.length; i++) {
+						*(msg_data + i) = message.data[i];
+					}
 				}
 			}
 			return 0;
@@ -83,4 +90,16 @@ int Driver(unsigned char com, unsigned char *msg_data, unsigned long *msg_id)
 		default:
 			return 7;
 	}
+}
+
+int can_fd_wait(int fd, int wait_usec)
+{
+	int ret;
+	struct timeval timeout;
+	fd_set set;
+	FD_ZERO(&set);
+	FD_SET(fd, &set);
+	timeout.tv_sec = 0;
+	timeout.tv_usec = wait_usec;
+	return (select(FD_SETSIZE, &set, NULL, NULL, &timeout));
 }
