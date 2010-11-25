@@ -63,7 +63,8 @@ int ADC(unsigned short channel, unsigned long *result)
 
 	/*read adc channel*/
 	read_channel(adc_page, channel);
-	
+	usleep(2000);
+	read_channel(adc_page, channel);
 	read_channel(adc_page, channel);
 	
 	for (i = 0; i < 5; i++) {

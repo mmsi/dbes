@@ -30,6 +30,7 @@
 #include<sys/mman.h>
 #include<ctype.h>
 #include<unistd.h>
+#include<time.h>
 #include"include/control_str.h"
 
 #define DIO_PAGE     	0x80840000
@@ -37,6 +38,8 @@
 #define JUMPER_PAGE		0x10800000
 #define POS			 	0
 #define PRES		 	1
+#define DETENT_MIN		3
+#define DETENT_MAX		10
 
 /*configuration file name*/
 #define CONFIG_NAM "config"
@@ -59,10 +62,11 @@ char local_id = 0;
 
 int main()
 {
-	int i, c, man_status;
+	int i, c, man_status, detent, diff_flag;
 	char *jump6;
 	char *jump;
 	FILE *fp;
+	time_t updatetv;
 
 	devmem = open("/dev/mem", O_RDWR|O_SYNC);
 
@@ -94,12 +98,35 @@ int main()
 			Sensors(1, &status);
 			printf("pressure: %u height: %u", status.pressure, status.elevation);
 			printf(" buttons: %X\n", status.d_input);
-			if ((status.d_input & 0x8) == 0x0)
-			    local_control.function = 0xA;
-			else if ((status.d_input & 0x1) == 0x0)
-			    local_control.function = 0xC;
-			else
-				local_control.function = 0x8;
+			if (detent == 1) {
+				if (((status.d_input & DOWN) == 0x0) && (difftime(time(NULL),\
+				      updatetv) > DETENT_MAX)) {
+					local_control.function = 0x8;
+					detent = 0;
+				} else if ((status.d_input & UP) == 0x0) {
+					local_control.function = 0x8;
+					detent = 0;
+				}
+			} else if (diff_flag == 1) {
+				if ((status.d_input & DOWN) == 0x0) {
+					if ((difftime(time(NULL), updatetv)) > DETENT_MIN) {
+						detent = 1;
+						diff_flag = 0;
+					}
+				} else {
+					local_control.function = 0x8;
+					diff_flag = 0;
+				}
+			} else {
+				if ((status.d_input & UP) == 0x0)
+				    local_control.function = 0xA;
+				else if ((status.d_input & DOWN) == 0x0) {
+				    local_control.function = 0xC;
+					diff_flag = 1;
+					time(&updatetv);
+				} else
+					local_control.function = 0x8;
+			}
 			Hyd_Control(local_control);
 		}
 	}

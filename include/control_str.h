@@ -66,6 +66,10 @@ struct status_t {
 	unsigned char d_input;
 };
 
+#define	DOWN	0x1
+#define	UP		0x8
+#define INTERL	0x10
+
 /*global file descriptor for mmap to use*/
 extern int devmem;
 

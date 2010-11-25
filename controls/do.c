@@ -40,10 +40,7 @@ int Dout(int pin, int state)
 	static unsigned int *pbdr, *pbddr;
 	
 	/*initialization*/
-	if (pin == 0) {
-		//start = mmap(0, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED,
-		//				devmem, DIO_PAGE);
-		
+	if (pin == 0) {		
 		/*offsets*/
 		pbdr = (unsigned int *)(start + 0x04);
 		pbddr = (unsigned int *)(start + 0x14);
@@ -59,7 +56,7 @@ int Dout(int pin, int state)
 	} else if (state == OFF) {
 		*pbdr = (*pbdr & (~pin));
 	} else {
-		printf("digital output error, run and cry\n");
+		printf("digital output error\n");
 		return -1;
 	}
 	

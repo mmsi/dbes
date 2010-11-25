@@ -68,7 +68,7 @@ int Sensors(int mode, struct status_t *sensor_data)
 		/*convert to psi*/ //FIXME
 		sensor_data->pressure = (unsigned short)adc_result;
 	}
-	
+
 	/*elevation*/
 	if (ADC(CET, &adc_result) != 0) {
 		printf("ADC read error");
