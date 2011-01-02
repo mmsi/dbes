@@ -1,7 +1,15 @@
 #dbes_alpha makefile
 #origin 2-25-09
-#updated 2-25-10
-#jrm
+#updated 12-31-10
+#jrm<jrcowboy79@gmail.com>
+
+MAJOR = 0
+MINOR = 2
+STAGE = 0
+REVISION = 0
+
+VERSION = $(MAJOR).$(MINOR).$(STAGE).$(REVISION)
+export VERSION
 
 srcdir = $(PRJROOT)
 
@@ -15,13 +23,34 @@ LD                          = $(CROSS_COMPILE)ld
 
 export AS AR CC CPP LD
 
+#Configuation Settings
+ #PWM hardware (choose one)
+CPLD_XDIO_PWM = y
+EXT_AVR_PWM = n
+ #SPI framework (choose one)
+24_BITBANG_SPI = y
+26_SPIDEV = n
+
+configs-y :=
+configs-n :=
+
+configs-$(CPLD_XDIO_PWM) += -DCONFIG_XDIOPWM
+configs-$(EXT_AVR_PWM) += -DCONFIG_AVRPWM
+configs-$(24_BITBANG_SPI) += -DCONFIG_24SPI
+configs-$(26_SPIDEV) += -DCONFIG_26SPIDEV
+
+EXTRAFLAGS := $(configs-y)
+export EXTRAFLAGS
+
 #Build settings
 CFLAGS                  = -I$(srcdir)/include -mcpu=arm9 -Wall -g
 export CFLAGS
 export srcdir
 
+
 #Installation variables
-EXEC_NAME           = dbes_alpha
+NAME           = dbes
+EXEC_NAME = $(NAME)_$(VERSION)
 
 #Build files
 SUBDIRS = int_arb controls sensors
@@ -49,9 +78,9 @@ $(SUBDIRS):
 
 				
 main.o :	main.c include/control_str.h
-			$(CC) -c main.c $(CFLAGS)
+			$(CC) -c main.c $(CFLAGS) $(EXTRAFLAGS)
 			
 .PHONY : clean
 
 clean :
-		rm dbes_alpha $(OBJS) 
+		rm $(EXEC_NAME) $(OBJS) 

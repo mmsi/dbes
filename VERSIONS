@@ -1,0 +1,46 @@
+dbes/VERSIONS
+12-29-10
+jrm<jrcowboy79@gmail.com>
+
+Version Nomenclature-----
+	Versions are represented by positive integers in four fields:
+	
+						stage
+						  of
+	major	 minor	 development	revision
+	  X   .   XX    .     X       .     X
+	  
+major number represents milestones (see roadmap below)
+
+minor number represents incremental development between milestones
+
+stage of development represents code maturity: 	0 = alpha
+												1 = beta
+												2 = rc
+												3 = stable (yeah, right)
+
+revison represents bug fixes, trivial cleanups, etc.
+
+
+Roadmap-----
+	Unfortunately this project has changed a lot during the prototype phase and
+a software roadmap is difficult to define. But we need some way to track
+versions so I'll try. Note: I don't want this roadmap to correlate with code
+maturity. It would be nice if each milestone went through a feature freeze and
+stabilization before tearing everything apart and rebuilding(see line 20 above).
+So here it goes.
+
+Major 1: The most basic of functions working and robust. Since this is a mission
+critical system, reliability far overshadows ease of use and a wide range of
+features.
+-jumpered manual operation
+-networking
+-a simple user interface over the serial port to a laptop
+-automatic (minimal fault checking)
+
+Major 2: Full safety and reliablity features
+-full per-slave prediction and fault checking
+-full master fault checking and reporting
+-enhanced laptop UI, ncurses or gtk (requires remote application, which would be
+	good to offload processing and complexity from the master jack)
+-

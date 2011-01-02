@@ -8,10 +8,10 @@ control_str.h :
         
 
 pwm.o : pwm.c control_str.h
-		$(CC) -c pwm.c $(CFLAGS)
+		$(CC) -c pwm.c $(CFLAGS) $(EXTRAFLAGS)
 		
 do.o :  do.c include/control.h control_str.h
-		$(CC) -c do.c $(CFLAGS)
+		$(CC) -c do.c $(CFLAGS) $(EXTRAFLAGS)
 		
 hyd_control.o : hyd_control.c include/control.h control_str.h
-				$(CC) -c hyd_control.c $(CFLAGS)
+				$(CC) -c hyd_control.c $(CFLAGS) $(EXTRAFLAGS)
