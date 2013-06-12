@@ -54,9 +54,9 @@ void Configuration(void);
 
 struct status_t status;
 struct cnt_template_t local_control;
+struct calib_t calib;
 int devmem;
 char *start;
-char calib[27];
 int h_status;
 char local_id = 0;
 
@@ -81,10 +81,13 @@ int main()
 	man_status = (*jump & 0x10);
 	h_status = (*jump6 & 0x1);
 	printf("initializing sensors...\n");
-	Sensors(0);
+	Sensors(0, &status, &calib);
 	local_control.function = 0x0080;
 	printf("initializing controls...\n");
 	Hyd_Control(local_control);
+	/*init int/arb*/
+	printf("initializing interface/arbitration...\n");
+	Arbitor(&status, &local_control);
 
 	if (man_status == 0) {
 		local_control.function = 0x0;
@@ -95,7 +98,7 @@ int main()
 		sleep(3);
 		local_control.rate = 255;
 		while (1) {
-			Sensors(1, &status);
+			Sensors(1, &status, &calib);
 			printf("pressure: %u height: %u", status.pressure, status.elevation);
 			printf(" buttons: %X\n", status.d_input);
 			if (detent == 1) {
@@ -110,11 +113,12 @@ int main()
 			} else if (diff_flag == 1) {
 				if ((status.d_input & DOWN) == 0x0) {
 					if ((difftime(time(NULL), updatetv)) > DETENT_MIN) {
+						//printf("difference = %d", updatetv);
 						detent = 1;
 						diff_flag = 0;
 					}
 				} else {
-					local_control.function = 0x8;
+					local_control.function = 0x8; //FIXME
 					diff_flag = 0;
 				}
 			} else {
@@ -134,42 +138,42 @@ int main()
 	/*configuration prompt*/
 	if (h_status == 1 ) {
 		/*master*/
-		fp = fopen(CONFIG_NAM, "r");
-		if (fp != NULL) {
-			for (i=0; i<=MAX_CONFIG; i++)
-				calib[i] = (char)fgetc(fp);//FIXME check for EOF or error
-			fclose(fp);
-		} else {
-			Configuration();
-			goto bypass; /*FIXME eliminate goto
-			need to jump past the prompt below*/
-		} //just move the block below into the if{} above
 		printf("would you like to enter configuration? y/n   ");
 		do {
 			c = (char)getchar();
 			if (c == 'y')
 				Configuration();
-		} while ((c != 'y') && (c != 'n'));
+		} while ((c != 'y') && (c != 'n'));	
+		if (LoadCalib(&calib) < 0) {
+			printf("\nBad config file... entering configuration anyway\n");
+			Configuration();
+			if (LoadCalib(&calib) < 0) {
+				printf("Still has a bad config file.\n");
+				printf("Filesystem needs repairs... Exiting.");
+				exit(0);
+			}
+		}
 	} else {
 		/*slave*/
-		fp = fopen(CONFIG_NAM, "r");
-		if (fp == NULL) {
-			printf("no configuration file");
+		if (LoadCalib(&calib) < 0) {
 			exit(0); //FIXME better alerting of operator, maybe over CAN
+			//shut off all valves first?
 		}
-		for (i = 0; i <= MAX_CONFIG; i++)
-			calib[i] = getc(fp);
-		fclose(fp);
 	}
+	
+	//FIXME local_id = (calib[0]*100) + (calib[1]*10) + calib[2];
+	//use new calib.id struct member
 
-	bypass:
-	local_id = (calib[0]*100) + (calib[1]*10) + calib[2];
-	printf("initializing interface/arbitration...\n");
-	Arbitor(&status, &local_control);
+	/*load calibration data*/
+	//FIXME send pointer everytime instead of this?
+	Sensors(2, &status, &calib);
+		
+	
+		
 	/*clear init*/
 	local_control.function = 0x0000;
 
-	/*infinite loop unless fatal error*/
+	/*Main Loop*/
 	do {
 		i = MainLoop();
 	} while (i == 0);
@@ -180,26 +184,41 @@ int main()
 
 int MainLoop()
 {
+	static unsigned short old_dest = 0;
+	
 	/*status_t status population*/
-	if (Sensors(1, &status) == 1) {
-		Contingency();
-		return 0;
+	if (Sensors(1, &status, &calib) == 1) {
+		printf("Sensors Error\n");
 	}
 
-	if ((local_control.function & 0x8) == 0x8) {
-		local_control.rate = 255;
-		if ((status.d_input & 0x1) == 0x1)
-			local_control.function = 0xC;
-		else if ((status.d_input & 0x8) == 0x8)
-		    local_control.function = 0xA;
+	if ((local_control.function & 0x8) == 0x8) { //MANUAL
+		local_control.rate = 255; //full rate
+		if ((status.d_input & UP) == 0x0)
+			local_control.function = 0xA;
+		else if ((status.d_input & DOWN) == 0x0)
+		    local_control.function = 0xC;
 		else
 		    local_control.function = 0x8;
 		Hyd_Control(local_control);
 		if (Arbitor(&status, &local_control) < 0)
-			Contingency();
-	} else {
+			printf("Arbitor Error\n");
+	} else { //AUTO
 		if (Arbitor(&status, &local_control) < 0)
-			Contingency();
+			printf("Arbitor Error\n");
+		//if (((local_control.function & 0x6) > 0x0) && ((local_control.dest-old_dest) > 2)) {
+			if (((local_control.function & 0x2) == 0x2) &&
+			    (status.elevation >= local_control.dest)) {
+				local_control.function = 0;
+			}
+
+			if (((local_control.function & 0x4) == 0x4) &&
+			    (status.elevation <= local_control.dest)) {
+				local_control.function = 0;
+			}
+			//old_dest = local_control.dest;
+		//}
+			
+		//printf("auto mode: calling hydraulic control\n");
 		Hyd_Control(local_control);
 	}
 	return 0;
@@ -235,45 +254,38 @@ void Configuration(void)
 	size_t len = 0;
 	FILE *fp;
 
-	fp = fopen(CONFIG_NAM, "w"); //FIXME add error handler
+	//FIXME disable previous noncanonical?
+
+	fp = fopen(CONFIG_NAM, "w");
 	if (fp < 0) {
 		printf("\nfopen failed\n");
 	}
 	setvbuf(fp, NULL, _IONBF, BUFSIZ);
 
 	/*address*/
-	printf("current address is: %.3s\n", &calib[0]);
-	printf("would you like to change the address? y/n   ");
+	printf("\nthe address must be three numeric digits and must not ex");
+	printf("ceed 255\nplease enter a three digit number:   ");
 	do {
-		c = getchar();
-		if (c == 'y') {
-			printf("\nthe address must be three numeric digits and must not ex");
-			printf("ceed 255\nplease enter a three digit number:   ");
-			do {
-				t = 0;
-				while (getline(&line, &len, stdin) != 4)
-					printf("\ntry again - 3 digits, press enter!  ");
-				for (i=(int)line;i<((int)line+3);i++) {
-					if((isdigit((int)(*(line + t)))) == 0) {
-						t++;
-						printf("\nonly use digits  ");
-					}
-				}
-			} while (t != 0);
-			printf("\naddress is: %.3s", line);
-			fprintf(fp, "%.3s", line);
-		} else if (c == 'n')
-			fprintf(fp, "%.3s", &calib[0]);
-	} while ((c != 'y') && (c != 'n'));
+		t = 0;
+		while (getline(&line, &len, stdin) != 4)
+			printf("\ntry again - 3 digits, press enter!  ");
+		for (i=(int)line;i<((int)line+3);i++) {
+			if((isdigit((int)(*(line + t)))) == 0) {
+				t++;
+				printf("\nonly use digits  ");
+			}
+		}
+	} while (t != 0);
+	printf("\naddress is: %.3s", line);
+	fprintf(fp, "%.3s\n", line);
 	
 	/*Pressure Transducer*/
 	/*offset*/
-	//FIXME flush stdin?
 	printf("\nset system pressure to zero and press enter\n");
 	getline(&line, &len, stdin);
 	raw = Sensor_cal(PRES);
 	printf("zero set at %u\n", raw);
-	fprintf(fp, "%5u", raw);
+	fprintf(fp, "%5u\n", raw);
 
 	/*scale*/
 	printf("disconnect return hose\n");
@@ -283,7 +295,7 @@ void Configuration(void)
 		printf("\ntry again, 'xxxx':  ");
 	raw_d = ((double)Sensor_cal(PRES) / strtod(line, NULL));
 	printf("\nraw = %4.3f", raw_d);
-	fprintf(fp, "%4.3f", raw_d);
+	fprintf(fp, "%4.3f\n", raw_d);
 
 	/*Position Transducer*/
 	/*offset*/
@@ -297,7 +309,7 @@ void Configuration(void)
 	Hyd_Control(local_control);
 	raw = Sensor_cal(POS);
 	printf("\nzero at %u\n", raw);
-	fprintf(fp, "%5u", raw);
+	fprintf(fp, "%5u\n", raw);
 
 	/*scale*/
 	printf("press enter when height is 24 to 36 inches\n");
@@ -311,7 +323,7 @@ void Configuration(void)
 	while (getline(&line, &len, stdin) != 6) //FIXME add string tests
 		printf("\ntry again, 'xx.xx'");
 	raw_d = ((((double)Sensor_cal(POS)) - ((double)raw)) / strtod(line, NULL));
-	fprintf(fp, "%4.3f", raw_d);
+	fprintf(fp, "%4.3f\n", raw_d);
 
 	local_control.function = 0x4;
 	local_control.rate = 0xFF;
@@ -319,4 +331,49 @@ void Configuration(void)
 	printf("\n\ncalibration complete\n");
 
 	fclose(fp);
+}
+
+int LoadCalib(struct calib_t *calib)
+{
+	int i;
+	FILE *fp;
+	char line[25];
+
+	fp = fopen(CONFIG_NAM, "r");
+	if (fp == NULL) {
+		return -1;
+		//FIXME perror?
+	}
+	for (i=0; i<5; i++) {
+		if (fgets(line, 25, fp) == NULL)
+			return -1;
+		switch (i) {
+			case 0:
+				calib->id = strtol(line, NULL, 10);
+				break;
+
+			case 1:
+				calib->pres_off = strtol(line, NULL, 10);
+				break;
+
+			case 2:
+				calib->pres_scal = strtof(line, NULL);
+				break;
+
+			case 3:
+				calib->height_off = strtol(line, NULL, 10);
+				//printf("height offset: %i\n", calib->height_off);
+				break;
+
+			case 4:
+				calib->height_scal = strtof(line, NULL);
+				//printf("height scale: %f\n", calib->height_scal);
+				break;
+
+			default:
+				break;
+		}
+	}
+	fclose(fp);	
+	return 0;
 }

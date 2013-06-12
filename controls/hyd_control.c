@@ -34,14 +34,14 @@ int Hyd_Control(struct cnt_template_t control)
 		return 0;
 	}
 	
-	/*contingency handler*/
+	/*contingency handler
 	if ((control.function & 0x0001) == 0x1) {
 		Dout(MASTER, OFF);
 		Dout(CHECK, OFF);
 		PWM(0, 1);
 		Dout(AUX_PWM, OFF);
 		return 0;
-	}
+	}*/
 	
 	switch (control.function & 0x0006) {
 		case 0x0:

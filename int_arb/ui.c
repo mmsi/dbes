@@ -36,6 +36,8 @@
 #define PRES_SCALE 0
 
 #define SPACE '\x20'
+#define UP '\027[A'
+#define DOWN '\027[B'
 #define STDIN_FILENO 0 //FIXME should be declared in a header, sys/types.h?
 #define NB_ENABLE 1
 #define NB_DISABLE 2
@@ -78,7 +80,7 @@ int UI(int mode)
 		printf("\t\t|   1\t|   2\t|   3\t|   4\t|   5\t|   6\t|   7\t|   8\t|   9\t|   10\t|\n");
 		printf(" height (in)\t|");
 		for (i=0; i<10; i++) {
-			printf(" %u\t|", status_table[i].elevation);
+			printf(" %5.2f\t|", ((float)status_table[i].elevation)/100);
 		}
 		printf("\n pressure\t|");
 		for (i=0; i<10; i++) {
@@ -93,7 +95,7 @@ int UI(int mode)
 			total_weight = (total_weight + (status_table[i].pressure * CYL_AREA));
 		}
 		printf("\n\n Total Weight: %5.1f\t\tLift Rate: %u", total_weight, control.rate);
-		printf(" in/min\t\tDestination: %u inches", control.dest);
+		printf(" raw\tDestination:%5.2f inches", ((float)control.dest)/100);
 		time(&updatetv);
 		updated = 1;
 	} else
@@ -109,18 +111,19 @@ int UI(int mode)
 			printf("to return to automatic control press <space>\n");
 		}
 
-		if (mode == LOC_STOP) {
+		if (1) {
 			if (kbhit() != 0) {
 				switch (fgetc(stdin)) {
 					case 'z':
 						Nonblock(NB_DISABLE);
-						//FIXME flush stdin
+						//FIXME need a timeout for this blocking prompt to get 
+						// back to regular controls
 						printf("set system to zero? <y/n>\n");
 						do {
 							c = getchar();
 							if (c == 'y') {
 								Nonblock(NB_ENABLE);
-								ui.function = (ui.function & 0x20);
+								ui.function |= 0x20;
 								return ;
 							} else if (c == 'n') {
 								Nonblock(NB_ENABLE);
@@ -128,43 +131,45 @@ int UI(int mode)
 							}
 						} while ((c != 'y') && (c != 'n'));
 					case SPACE:
-						ui.function = (ui.function - 0x8);
+						ui.function = 0;
 				}
 			}
-		return 0;
 		}
+	return 0;
 	}
 
 	if (updated == 1) {
 		printf("\n\n\n_Key Commands________________________________\n");
-		printf("| START/STOP ---------------- spacebar\n");
-		printf("| change direction ---------- d\n");
-		printf("| adjust lift rate ---------- l <rate> enter\n");
-		printf("| enter manual control ------ m\n\n");
+		printf("| START/STOP ------------------ spacebar\n");
+		printf("| change direction ------------ d\n");
+		printf("| adjust destination height --- q: up    a: down\n");
+		printf("| reset destination ----------- r\n");
+		printf("| adjust lift rate ------------ l <rate> enter\n");
+		printf("| enter manual control -------- m\n\n");
 		if (lift_flag == LOWER)
 			printf(" Lowering mode active\n\n");
 		else
 			printf(" Lifting mode active\n\n");
-		switch (control.function & 0x3) {
+		switch (control.function & 0x6) {
 			case 0x0:
 				printf(" Status: ...holding load\n");
 				break;
 			
-			case 0x1:
+			case 0x2:
 				printf(" Status: ...lifting\n");
 				break;
 				
-			case 0x2:
+			case 0x4:
 				printf(" Status: ...lowering\n");
 		}
 	}
 
 	//FIXME this needs to be updated on analysis of contingency routing
-	if ((control.function & 0x1) == 0x1) {
+	/*if ((control.function & 0x1) == 0x1) {
 		printf("\t!!!! SYSTEM ERROR - STOPPING LIFT !!!!\n");
 		printf("\tcheck system for problems\n");
 		printf("\tIf system is ok press reset <r>\n");
-	}
+	}*/
 		
 	
 	/*user input*/
@@ -174,31 +179,50 @@ int UI(int mode)
 				switch (control.function & 0x6) {
 					case 0x0:
 						if (lift_flag == LIFT)
-							ui.function = (ui.function + 0x2);
+							ui.function |= 0x2;
 						else
-							ui.function = (ui.function + 0x4);
+							ui.function |= 0x4;
 						break;
 					
 					case 0x2:
-						ui.function = (ui.function - 0x2);
+						ui.function &= ~0x2;
 						lift_flag = LIFT;
 						break;
 					
 					case 0x4:
-						ui.function = (ui.function - 0x4);
+						ui.function &= ~0x4;
 						lift_flag = LOWER;
 				}
 				break;
 
 			case 'd': //change direction
 				lift_flag = ((~lift_flag) & 0x1);
-				break;
+				if ((control.function & 0x6)== 0x2) {
+					ui.function = 0x4;
+					lift_flag = LOWER;
+				} else if ((control.function & 0x6) == 0x4) {
+					ui.function = 0x2;
+					lift_flag = LIFT;
+				} else 
+					break;	
 			
 			case 'l': //adjust rate
 				break;
 			
 			case 'm': //manual control
 				ui.function = 0x8;
+				break;
+
+			case 'q': //destination up
+				ui.dest++;
+				break;
+
+			case 'a': //destination down
+				ui.dest--;
+				break;
+
+			case 'r': //reset destination to 0
+				ui.dest = 0;
 				break;
 	
 		}

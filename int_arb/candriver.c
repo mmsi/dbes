@@ -49,22 +49,26 @@ int Driver(unsigned char com, unsigned char *msg_data, unsigned long *msg_id)
 
 	switch (com) {
 		case CAN_INI: //ini
-			fd = open(specialfile, O_RDWR|O_NONBLOCK);
+			fd = open(specialfile, O_RDWR|O_SYNC);
 			if (fd<0) {
 				printf("Error opening %s\n", specialfile);
-				return 1;
+				return -1;
 			}
 			return 0;
 
 		case CAN_RX: //receive
 			ret = can_fd_wait(fd, CAN_WAIT_USEC);
-			if (ret == 1) {
+			*msg_id  = 0;
+			//printf("ret = %i\n", ret);
+			if (ret != 0) {
 				ret = read(fd, &message, sizeof(struct canmsg_t));
+				//printf("CAN bytes: %i\n", ret);
+				//printf("message ID = %i\n", message.id);
 				if (ret<0)
-					return 3;
+					return -1;
 				else {
 					*msg_id = message.id;
-					for (i=0; i<message.length; i++) {
+					for (i=0; i<7; i++) {
 						*(msg_data + i) = message.data[i];
 					}
 				}
@@ -72,14 +76,15 @@ int Driver(unsigned char com, unsigned char *msg_data, unsigned long *msg_id)
 			return 0;
 
 		case CAN_TX: //send FIXME check if successful
-		    message.flags &= ~MSG_EXT;
+		    message.flags = 0;
 			message.id = *msg_id;
-			for (i=0; i<6; i++) {
+			message.length = 8;
+			for (i=0; i<7; i++) {
 				message.data[i] = *(msg_data + i);
 			}
 			ret = write(fd, &message, sizeof(struct canmsg_t));
 			if (ret<0)
-				return 3;
+				return -1;
 			else
 				return 0;
 		
@@ -88,13 +93,12 @@ int Driver(unsigned char com, unsigned char *msg_data, unsigned long *msg_id)
 		    return 0;
 		    
 		default:
-			return 7;
+			return -1;
 	}
 }
 
 int can_fd_wait(int fd, int wait_usec)
 {
-	int ret;
 	struct timeval timeout;
 	fd_set set;
 	FD_ZERO(&set);

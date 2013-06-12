@@ -24,6 +24,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
+#define _GNU_SOURCE
 #include<stdio.h>
 #include<unistd.h>
 #include"../include/control_str.h"
@@ -47,70 +48,59 @@ int Arbitor(struct status_t *local_status, struct cnt_template_t *local)
 {
 	int ret;
 	
-	/*contingency router*/
-	if ((local->function & 0x01) == 0x1) {
-	    if (h_status == 1) {
-	        Master(local);    
-	        UI(CONT);  
-	        local->function = (local->function + 0x10);\
-	        Master(local); //FIXME assume global recovery or request statuses?
-	        local->function = 0;
-	    } else {
-	        Slave(local);
-	        local->function = 0;
-	    }
-	    return 0;
-	}
-	
-	/*initialize*/
-	if (local->function == 0x80) {
-		printf("Initializing network...  ");
-		ret = Elections();
-		if (h_status == 1) {
-			ret = JackDatabase();
-			if (ret < 0) {
-				printf("FAILURE!!!\nactive jacks detected: %i\n", active);
-				printf("check connections and restart system\n\n");
-				return -1; //FIXME this needs to return something coherent
-			}
-			printf("active jacks on system: %i\n", active);
-		} else {
-			Broadcast();
-		}	
-		ini_flag = 1;
+
+	if ((local->function & 0x80) == 0x80) {
+		printf("Elections\n");
+		Elections();
+		control.dest = 0;
 		return 0;
 	}
 	
+	/*normal int/arb operations*/
+
 	/*push local jack status to array*/
 	status_table[0] = *local_status;
-	//FIXME needs .function to be locally populated
-	
-	/*normal int/arb operations*/
 	
 	/*master*/
 	if (h_status == 1) {
+		//printf("master: int/arb\n");
+		//control.dest = (local_status->elevation - local_status->offset);
+		control.rate = 255; //adopt full rate for now
 		if ((local->function & 0x6) > 0)
 			UI(LOC_ACTIVE);
 		else
 			UI(LOC_STOP);
 		ret = Master(local);
-		if (ret < 0) {
-			printf("master routine error, calling contingency.");
-			return -1;
-		}
 		
 	/*slave*/
 	} else if (h_status == 0) {
+		//printf("slave: int/arb\n");
 		ret = Slave(local);
 		if (ret < 0) {
-			//printf("slave routine error, calling contingency.");
-			return -1;
-		} else if (ret == 2)
-			local_status->offset = local_status->elevation;
+			printf("slave/CAN Error");
+		}
+		//printf("local function = %i\n", local->function);
+		//printf("control function = %i\n", control.function);
+		
+		//if ((local->function & 0x8) == 0x8) {
+		//	printf("manual mode\n");
+		//}
 	} else {
 		printf("h_status variable out of bounds, please panic.");
 		return 0; //FIXME returning normal, should this condition cause cont?
 	}
+
+	/** Master/Slave Common Code **/
+
+	/* Local System Zeroing */
+	if ((control.function & 0x20) == 0x20) {
+		local_status->offset = local_status->elevation;
+		control.function &= ~0x20;
+		printf("System Zeroed...\nzero set at: %i\n", local_status->offset);
+	}
+
+	/* Pass new control data to local jack */
+	*local = control;
 	
 	return 0;
 }

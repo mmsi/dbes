@@ -38,7 +38,7 @@
 int JackDatabase();
 int Broadcast(void);
 
-char e_message_array[MSG_LENGTH];
+unsigned char e_message_array[MSG_LENGTH];
 unsigned long e_msg_id;
 char active_table[];
 int master_flag;
@@ -49,9 +49,9 @@ int Elections()
 	int ret;
 
 	/*initialize CAN*/
-	ret = Driver(CAN_INI, &e_message_array[0], &e_msg_id);
+	ret = Driver(CAN_INI, e_message_array, &e_msg_id);
 
-	return 1;
+	return 0;
 }
 
 int JackDatabase()

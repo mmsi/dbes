@@ -37,7 +37,7 @@
 #define CAN_FILTER	4
 
 /*max number of CAN data bytes*/
-#define MSG_LENGTH	7
+#define MSG_LENGTH	8
 
 /*message id*/
 #define MASTER_PING			10  //no data

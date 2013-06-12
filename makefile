@@ -1,11 +1,11 @@
-#dbes_alpha makefile
+#spi sandbox makefile
 #origin 2-25-09
 #updated 12-31-10
 #jrm<jrcowboy79@gmail.com>
 
-MAJOR = 0
-MINOR = 2
-STAGE = 0
+MAJOR = 1
+MINOR = 0
+STAGE = 1
 REVISION = 0
 
 VERSION = $(MAJOR).$(MINOR).$(STAGE).$(REVISION)

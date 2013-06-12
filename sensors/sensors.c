@@ -31,12 +31,29 @@
 #define POS 		0
 #define PRES		1
 
+/*Function Prototypes*/
+int Sensor_cal(int);
+float sensor_convdata(unsigned long, float, int);
+
 unsigned long adc_result;
 
-int Sensors(int mode, struct status_t *sensor_data)
+int Sensors(int mode, struct status_t *sensor_data, struct calib_t *calib)
 {
 	int ret;
 	
+	static int p_offset;
+	static int h_offset;
+	static float p_scale;
+	static float h_scale;
+
+	/*load calibration data*/
+	if (mode == 2) {
+		p_offset = calib->pres_off;
+		h_offset = calib->height_off;	
+		h_scale = calib->height_scal;
+		p_scale = calib->pres_scal;
+	}	
+		
 	/*initialize*/
 	if (mode < 1) {
 		ret = DI(0);
@@ -62,19 +79,22 @@ int Sensors(int mode, struct status_t *sensor_data)
 	
 	/*  read sensors  */
 	/*pressure*/
+	int pressure;
 	if (ADC(PR_TRANS, &adc_result) != 0) {
 		printf("ADC read error");
 	} else {
 		/*convert to psi*/ //FIXME
+		pressure = sensor_convdata(adc_result, p_scale, p_offset);
 		sensor_data->pressure = (unsigned short)adc_result;
 	}
 
 	/*elevation*/
+	int inches;
 	if (ADC(CET, &adc_result) != 0) {
 		printf("ADC read error");
 	} else {
-		/*convert to inches*/ //FIXME add conversion alorithm
-		sensor_data->elevation = (unsigned short)adc_result;
+		/*convert to inches*/ //FIXME add conversion algorithm
+		sensor_data->elevation = (unsigned short)(sensor_convdata(adc_result, h_scale, h_offset)*100);
 	}
 	return 0;
 }
@@ -89,4 +109,16 @@ int Sensor_cal(int mode)
 		return (int)adc_result;
 	} else
 		return (DI(1));
+}
+
+float sensor_convdata(unsigned long adc_data, float scale, int offset)
+{
+	float ret_var = 0;
+	if ((scale !=0) && (offset != 0)) {
+		ret_var = ((float)adc_data - (float)offset) / scale;
+	}
+	//printf("offset = %i\n", offset);
+	//printf("scale = %f\n", scale);
+	//printf("inches return = %f\n", ret_var);
+	return ret_var;
 }

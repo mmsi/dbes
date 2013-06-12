@@ -22,121 +22,75 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
+#define _GNU_SOURCE
 #include"../include/control_str.h"
 #include"include/intarb.h"
 #include"include/candriver.h"
 
 #define MAXSTAT 20
-#define UPDATE	20
+#define UPDATE	40
 
-char m_message_array[MSG_LENGTH];
+unsigned char m_message_array[MSG_LENGTH];
 unsigned long m_msg_id;
 
 int Master(struct cnt_template_t *local)
 {
-	int ret=0, i=0, ii=0, cnt_update;
+	int ret=0, i=0, ii=0;
+	static int cnt_update;
 	
 	struct cnt_template_t m_ui;
 
-	/*contingency bit check*/
-	if ((local->function & 0x1) == 0x1) {
-	    /*recovery bit check*/
-	    if ((local->function & 0x11) == 0x11) {
-	        m_msg_id = CONT_RECOV;
-	        if (Driver(CAN_TX, &m_message_array[0], &m_msg_id) != 0)
-	            return -1;
-	        return 0;
-		} else {
-    		m_msg_id = CONT;
-	    	if (Driver(CAN_TX, &m_message_array[0], &m_msg_id) != 0) //FIXME need handlers
-	    	//for different errors and return codes
-	    		return -1;
-    		return 0;
-	    }
-	}
+	
 
 	/*local ui retrieval*/
-	ControlUpdate(&ui);
+	/*limit this to .function and .dest for now. Different master routines
+	 *will modify the other structure members*/
+	control.function = ui.function;
+	control.dest = ui.dest;
 
+
+
+	/*do { //flush CAN receive buffers, do nothing with it 
+		ret = Driver(CAN_RX, m_message_array, &m_msg_id);
+		if (ret != 0)
+			return -1;
+	} while (m_msg_id != 0);*/
+
+	/* System Zeroing */
 	if ((control.function & 0x20) == 0x20) {
 		m_msg_id = ZERO;
-		if (Driver(CAN_TX, &m_message_array[0], &m_msg_id) != 0)
+		if (Driver(CAN_TX, m_message_array, &m_msg_id) < 0)
 			return -1;
-		control.function = (control.function - 0x20);
+		ui.function &= ~0x20;
+		return 0;
 	}
-
-	do {
-		ret = Driver(CAN_RX, &m_message_array[0], &m_msg_id);
-		if (ret != 0)
-			return -1;
-		switch (m_msg_id) {
-			case MASTER_PING: //master ping
-				m_msg_id = PING_REPLY;
-				m_message_array[0] = 0;
-				ret = Driver(CAN_TX, &m_message_array[0], &m_msg_id);
-				break;
-
-			case CONT: //contingency broadcast
-				/*
-				 *is a contingency re-broadcast necessary?
-				
-				m_msg_id = CONT;
-				m_message_array[0] = 0;
-				ret = Driver(TX, &m_message_array[0], &m_msg_id);
-				if (ret != 0) {
-					return -1;
-				} else {*/
-					control.function = 1;
-				return 0;
-			//FIXME add status request hanlder
-			case STATUS: //status response
-				for (i=0; ii==1; i++) { // calculate array offset by jack address
-					if (jack_lookup_table[i] == m_message_array[0])
-						ii = 1;
-				} //FIXME add nonexistent address handler
-				status_table[i].elevation = m_message_array[1];
-				status_table[i].elevation = ((status_table[i].elevation << 8) + m_message_array[2]);
-				status_table[i].offset = m_message_array[3];
-				status_table[i].offset = ((status_table[i].offset << 8) + m_message_array[4]);
-				status_table[i].pressure = m_message_array[5];
-				status_table[i].pressure = ((status_table[i].pressure << 8) + m_message_array[6]);
-				break;
-
-			case UIPASS: //remote ui retrieval (depracated)
-				m_ui.function = m_message_array[0];
-				m_ui.function = ((m_ui.function << 8) + m_message_array[1]);
-				m_ui.dest = m_message_array[2];
-				m_ui.dest = ((m_ui.dest << 8) + m_message_array[3]);
-				m_ui.rate = m_message_array[4];
-				ControlUpdate(&m_ui);
-				
-		}
-
-	} while (m_msg_id != 0);
-
+	
+	/* Broadcast control message */
 	if (cnt_update > UPDATE) {
-		m_message_array[0] = (control.function >> 8);
-		m_message_array[1] = (char) control.function;
-		m_message_array[2] = (control.dest >> 8);
-		m_message_array[3] = (char) control.dest;
-		m_message_array[4] = control.rate;
 		m_msg_id = CONTROL;
+		m_message_array[0] = control.function;
+		m_message_array[1] = control.id;
+		m_message_array[2] = (unsigned char)control.dest;
+		m_message_array[3] = (unsigned char)(control.dest >> 8);
+		m_message_array[4] = control.rate;
+		//m_message_array[5] = control.dest;
+		//m_message_array[6] = control.function;
+		//m_message_array[7] = control.id;
 
-		ret = Driver(CAN_TX, &m_message_array[0], &m_msg_id);
-		if (ret != 0)
+		ret = Driver(CAN_TX, m_message_array, &m_msg_id);
+		if (ret < 0)
 			return -1;
 		cnt_update = 0;
 	} else {
 		cnt_update++;
-		StatusScheduler();
 	}
 }
 
-int ControlUpdate(struct cnt_template_t *l_ui)
+/*int ControlUpdate(struct cnt_template_t *l_ui)
 {
 	control = *l_ui;
 	return;
-}
+}*/
 
 int StatusScheduler()
 {
@@ -153,9 +107,9 @@ int StatusScheduler()
 		i = 0;
 		id++;
 		if (id == active)
-			id = 0;
+			id = 1;
 	} else {
 		i++;
 	}
-	return;
+	return 0;
 }
