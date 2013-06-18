@@ -73,9 +73,6 @@ int Master(struct cnt_template_t *local)
 		m_message_array[2] = (unsigned char)control.dest;
 		m_message_array[3] = (unsigned char)(control.dest >> 8);
 		m_message_array[4] = control.rate;
-		//m_message_array[5] = control.dest;
-		//m_message_array[6] = control.function;
-		//m_message_array[7] = control.id;
 
 		ret = Driver(CAN_TX, m_message_array, &m_msg_id);
 		if (ret < 0)

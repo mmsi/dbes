@@ -80,7 +80,7 @@ int UI(int mode)
 		printf("\t\t|   1\t|   2\t|   3\t|   4\t|   5\t|   6\t|   7\t|   8\t|   9\t|   10\t|\n");
 		printf(" height (in)\t|");
 		for (i=0; i<10; i++) {
-			printf(" %5.2f\t|", ((float)status_table[i].elevation)/100);
+			printf(" %5.2f\t|", (((float)status_table[i].elevation)-(float)status_table[i].offset)/100);
 		}
 		printf("\n pressure\t|");
 		for (i=0; i<10; i++) {
@@ -124,7 +124,7 @@ int UI(int mode)
 							if (c == 'y') {
 								Nonblock(NB_ENABLE);
 								ui.function |= 0x20;
-								return ;
+								return 0;
 							} else if (c == 'n') {
 								Nonblock(NB_ENABLE);
 								break;
@@ -227,7 +227,7 @@ int UI(int mode)
 	
 		}
 	}
-	return;
+	return 0;
 }
 
 int kbhit()

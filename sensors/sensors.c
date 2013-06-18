@@ -94,7 +94,7 @@ int Sensors(int mode, struct status_t *sensor_data, struct calib_t *calib)
 		printf("ADC read error");
 	} else {
 		/*convert to inches*/ //FIXME add conversion algorithm
-		sensor_data->elevation = (unsigned short)(sensor_convdata(adc_result, h_scale, h_offset)*100);
+		sensor_data->elevation = (short)(sensor_convdata(adc_result, h_scale, h_offset)*100);
 	}
 	return 0;
 }

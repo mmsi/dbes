@@ -34,7 +34,7 @@
  *		bit 6		   			undefined
  *		bit 7			       	init flag
  *unsigned char	id		   		jack id
- *unsigned short dest			destination height
+ *short dest					destination height
  *unsigned char rate			lifting rate - raw linear 0-255
  */
 
@@ -42,14 +42,14 @@
 struct cnt_template_t {
 	unsigned char function;
 	unsigned char id;
-	unsigned short dest;
+	short dest;
 	unsigned char rate;
 };
 
 /**
  *status_t
- *unsigned short elevation		elevation
- *unsigned short offset			elevation zero offset
+ *short elevation				elevation
+ *short offset					elevation zero offset
  *unsigned short pressure		pressure transducer
  *unsigned char d_input			button and limit switches
  *		bit 0			down button
@@ -62,8 +62,8 @@ struct cnt_template_t {
 
 /*individual jack status type*/
 struct status_t {
-	unsigned short elevation;
-	unsigned short offset;
+	short elevation;
+	short offset;
 	unsigned short pressure;
 	unsigned char d_input;
 };

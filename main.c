@@ -160,9 +160,6 @@ int main()
 			//shut off all valves first?
 		}
 	}
-	
-	//FIXME local_id = (calib[0]*100) + (calib[1]*10) + calib[2];
-	//use new calib.id struct member
 
 	/*load calibration data*/
 	//FIXME send pointer everytime instead of this?
@@ -207,12 +204,12 @@ int MainLoop()
 			printf("Arbitor Error\n");
 		//if (((local_control.function & 0x6) > 0x0) && ((local_control.dest-old_dest) > 2)) {
 			if (((local_control.function & 0x2) == 0x2) &&
-			    (status.elevation >= local_control.dest)) {
+			    ((status.elevation - status.offset) >= local_control.dest)) {
 				local_control.function = 0;
 			}
 
 			if (((local_control.function & 0x4) == 0x4) &&
-			    (status.elevation <= local_control.dest)) {
+			    ((status.elevation - status.offset) <= local_control.dest)) {
 				local_control.function = 0;
 			}
 			//old_dest = local_control.dest;
