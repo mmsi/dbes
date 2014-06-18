@@ -41,10 +41,10 @@ int Sensors(int mode, struct status_t *sensor_data, struct calib_t *calib)
 {
 	int ret;
 	
-	static int p_offset;
-	static int h_offset;
-	static float p_scale;
-	static float h_scale;
+	static int p_offset = 0;
+	static int h_offset = 0;
+	static float p_scale = 0;
+	static float h_scale = 0;
 
 	/*load calibration data*/
 	if (mode == 2) {
@@ -94,7 +94,7 @@ int Sensors(int mode, struct status_t *sensor_data, struct calib_t *calib)
 		printf("ADC read error");
 	} else {
 		/*convert to inches*/ //FIXME add conversion algorithm
-		sensor_data->elevation = (short)(sensor_convdata(adc_result, h_scale, h_offset)*100);
+		sensor_data->elevation = (short)(sensor_convdata(adc_result, h_scale, h_offset));
 	}
 	return 0;
 }
@@ -115,8 +115,10 @@ float sensor_convdata(unsigned long adc_data, float scale, int offset)
 {
 	float ret_var = 0;
 	if ((scale !=0) && (offset != 0)) {
-		ret_var = ((float)adc_data - (float)offset) / scale;
-	}
+		ret_var = (((float)adc_data - (float)offset) / scale)*100;
+		//FIXME unfloating the inch number here (temporarily)
+	} else
+		return (float)adc_data; 
 	//printf("offset = %i\n", offset);
 	//printf("scale = %f\n", scale);
 	//printf("inches return = %f\n", ret_var);
