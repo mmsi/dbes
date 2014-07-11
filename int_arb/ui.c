@@ -142,7 +142,8 @@ int UI(int mode)
 		printf("\n\n\n_Key Commands________________________________\n");
 		printf("| START/STOP ------------------ spacebar\n");
 		printf("| change direction ------------ d\n");
-		printf("| adjust destination height --- q: up    a: down\n");
+		printf("| adjust destination (.01) ---- q: up    a: down\n");
+		printf("| adjust destination (.1) ----- w: up    s: down\n");
 		printf("| reset destination ----------- r\n");
 		printf("| adjust lift rate ------------ l <rate> enter\n");
 		printf("| enter manual control -------- m\n\n");
@@ -213,12 +214,20 @@ int UI(int mode)
 				ui.function = 0x8;
 				break;
 
-			case 'q': //destination up
+			case 'q': //destination up .01"
 				ui.dest++;
 				break;
 
-			case 'a': //destination down
+			case 'a': //destination down .01"
 				ui.dest--;
+				break;
+
+			case 'w': //destination up .1"
+				ui.dest += 10;
+				break;
+
+			case 's': //destination down .1"
+				ui.dest -= 10;
 				break;
 
 			case 'r': //reset destination to 0

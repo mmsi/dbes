@@ -1,12 +1,13 @@
-#spi sandbox makefile
+#dbes
+#toplevel makefile
 #origin 2-25-09
-#updated 12-31-10
+#updated 7-11-14
 #jrm<jrcowboy79@gmail.com>
 
 MAJOR = 1
 MINOR = 0
 STAGE = 1
-REVISION = 2
+REVISION = 4
 
 VERSION = $(MAJOR).$(MINOR).$(STAGE).$(REVISION)
 export VERSION
@@ -39,6 +40,9 @@ configs-$(EXT_AVR_PWM) += -DCONFIG_AVRPWM
 configs-$(24_BITBANG_SPI) += -DCONFIG_24SPI
 configs-$(26_SPIDEV) += -DCONFIG_26SPIDEV
 
+configs-y :=
+configs-n :=
+
 EXTRAFLAGS := $(configs-y)
 export EXTRAFLAGS
 
@@ -50,7 +54,7 @@ export srcdir
 
 #Installation variables
 NAME           = dbes
-EXEC_NAME = $(NAME)_$(VERSION)
+EXEC_ = $(NAME)_$(VERSION)
 
 #Build files
 SUBDIRS = int_arb controls sensors
@@ -83,4 +87,4 @@ main.o :	main.c include/control_str.h
 .PHONY : clean
 
 clean :
-		rm $(EXEC_NAME) $(OBJS) 
+		rm $(NAME)_* $(OBJS) 
