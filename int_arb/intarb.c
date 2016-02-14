@@ -47,7 +47,7 @@ int ini_flag = 0;
 int Arbitor(struct status_t *local_status, struct cnt_template_t *local)
 {
 	int ret;
-	
+	FILE *fp;
 
 	if ((local->function & 0x80) == 0x80) {
 		printf("Elections\n");
@@ -97,6 +97,24 @@ int Arbitor(struct status_t *local_status, struct cnt_template_t *local)
 		local_status->offset = local_status->elevation;
 		control.function &= ~0x20;
 		printf("System Zeroed...\nzero set at: %i\n", local_status->offset);
+
+		fp = fopen(CONFIG_NAM, "r+");
+		if (fp == NULL) {
+			printf("zeroing: cannot open file");
+			break;
+		}
+		setvbuf(fp, NULL, _IONBF, BUFSIZ);
+
+		for (i=0; i<=4; i++) {
+			if (fgets(line, 25, fp) == NULL) {
+				printf("zeroing: cannot read file");
+				fclose(fp);
+				break;
+			}
+		}
+
+		fprintf(fp, "%04u\n", local_status->offset);
+		fclose(fp);
 	}
 
 	/* Pass new control data to local jack */
