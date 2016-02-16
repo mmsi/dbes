@@ -5,9 +5,9 @@
 #jrm<jrcowboy79@gmail.com>
 
 MAJOR = 1
-MINOR = 0
+MINOR = 1
 STAGE = 1
-REVISION = 4
+REVISION = 0
 
 VERSION = $(MAJOR).$(MINOR).$(STAGE).$(REVISION)
 export VERSION

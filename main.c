@@ -41,12 +41,6 @@
 #define DETENT_MIN		3
 #define DETENT_MAX		10
 
-/*configuration file name*/
-#define CONFIG_NAM "config"
-
-/*length of configuration file (characters)*/
-#define MAX_CONFIG 29
-
 /*prototypes*/
 int MainLoop();
 void Contingency(void);
@@ -366,6 +360,10 @@ int LoadCalib(struct calib_t *calib)
 			case 4:
 				calib->height_scal = strtof(line, NULL);
 				//printf("height scale: %f\n", calib->height_scal);
+				break;
+
+			case 5:
+				status_offset = (short)strtol(line, NULL);
 				break;
 
 			default:

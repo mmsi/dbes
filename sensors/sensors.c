@@ -112,6 +112,10 @@ int Sensor_cal(int mode)
 }
 
 float sensor_convdata(unsigned long adc_data, float scale, int offset)
+/* Note: this function returns a float left shifted by two decimal points
+ * so that can be converted to an int (or equivelent) for transmission over
+ * the bus. So the end-user of this data needs to reshift it before consumption.
+ */
 {
 	float ret_var = 0;
 	if ((scale !=0) && (offset != 0)) {
