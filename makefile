@@ -54,7 +54,7 @@ export srcdir
 
 #Installation variables
 NAME           = dbes
-EXEC_ = $(NAME)_$(VERSION)
+EXEC_NAME = $(NAME)_$(VERSION)
 
 #Build files
 SUBDIRS = int_arb controls sensors

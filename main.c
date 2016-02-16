@@ -156,6 +156,7 @@ int main()
 	} else {
 		/*slave*/
 		if (LoadCalib(&calib) < 0) {
+			printf("\nConfiguration file loading failed!!!\n");
 			exit(0); //FIXME better alerting of operator, maybe over CAN
 			//shut off all valves first?
 		}

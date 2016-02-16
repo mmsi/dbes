@@ -75,7 +75,7 @@ int Driver(unsigned char com, unsigned char *msg_data, unsigned long *msg_id)
 			}
 			return 0;
 
-		case CAN_TX: //send FIXME check if successful
+		case CAN_TX: //send XXX FIXME check if successful
 		    message.flags = 0;
 			message.id = *msg_id;
 			message.length = 8;
