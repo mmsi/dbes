@@ -191,6 +191,7 @@ int main()
 	} else {
 		/*slave*/
 		if (LoadCalib(&calib) < 0) {
+			printf("\nConfiguration file loading failed!!!\n");
 			exit(0); //FIXME better alerting of operator, maybe over CAN
 			//shut off all valves first?
 		}
@@ -376,7 +377,7 @@ int LoadCalib(struct calib_t *calib)
 		return -1;
 		//FIXME perror?
 	}
-	for (i=0; i<5; i++) {
+	for (i=0; i<6; i++) {
 		if (fgets(line, 25, fp) == NULL)
 			return -1;
 		switch (i) {
@@ -403,7 +404,7 @@ int LoadCalib(struct calib_t *calib)
 				break;
 
 			case 5:
-				status_offset = (short)strtol(line, NULL);
+				status.offset = (short)strtol(line, NULL, 10);
 				break;
 
 			default:

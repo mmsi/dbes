@@ -46,7 +46,8 @@ int ini_flag = 0;
 
 int Arbitor(struct status_t *local_status, struct cnt_template_t *local)
 {
-	int ret;
+	int ret, i;
+	char line[25];
 	FILE *fp;
 
 	if ((local->function & 0x80) == 0x80) {
@@ -101,7 +102,6 @@ int Arbitor(struct status_t *local_status, struct cnt_template_t *local)
 		fp = fopen(CONFIG_NAM, "r+");
 		if (fp == NULL) {
 			printf("zeroing: cannot open file");
-			break;
 		}
 		setvbuf(fp, NULL, _IONBF, BUFSIZ);
 
@@ -109,7 +109,6 @@ int Arbitor(struct status_t *local_status, struct cnt_template_t *local)
 			if (fgets(line, 25, fp) == NULL) {
 				printf("zeroing: cannot read file");
 				fclose(fp);
-				break;
 			}
 		}
 

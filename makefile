@@ -7,7 +7,7 @@
 MAJOR = 1
 MINOR = 1
 STAGE = 1
-REVISION = 0
+REVISION = 1
 
 VERSION = $(MAJOR).$(MINOR).$(STAGE).$(REVISION)
 export VERSION
@@ -54,7 +54,7 @@ export srcdir
 
 #Installation variables
 NAME           = dbes
-EXEC_ = $(NAME)_$(VERSION)
+EXEC_NAME = $(NAME)_$(VERSION)
 
 #Build files
 SUBDIRS = int_arb controls sensors
