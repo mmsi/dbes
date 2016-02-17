@@ -54,6 +54,47 @@ char *start;
 int h_status;
 char local_id = 0;
 
+
+int Manual(void)
+{
+	//local_control.function = 0x0;
+	//local_control.rate = 255;
+	//Sensors(1, &status, &calib);
+	if (detent == 1) {
+		if (((status.d_input & DOWN) == 0x0) && (difftime(time(NULL),\
+		      updatetv) > DETENT_MAX)) {
+			local_control.function = 0x8;
+			detent = 0;
+		} else if ((status.d_input & UP) == 0x0) {
+			local_control.function = 0x8;
+			detent = 0;
+		}
+	} else if (diff_flag == 1) {
+		if ((status.d_input & DOWN) == 0x0) {
+			if ((difftime(time(NULL), updatetv)) > DETENT_MIN) {
+				//printf("difference = %d", updatetv);
+				detent = 1;
+				diff_flag = 0;
+			}
+		} else {
+			local_control.function = 0x8; //FIXME
+			diff_flag = 0;
+		}
+	} else {
+		if ((status.d_input & UP) == 0x0)
+		    local_control.function = 0xA;
+		else if ((status.d_input & DOWN) == 0x0) {
+		    local_control.function = 0xC;
+			diff_flag = 1;
+			time(&updatetv);
+		} else
+			local_control.function = 0x8;
+	}
+	//Hyd_Control(local_control);
+	return 0;
+}
+
+	
 int main()
 {
 	int i, c, man_status, detent, diff_flag;
