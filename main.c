@@ -113,8 +113,10 @@ int main()
 	jump = mmap(0, 4096, PROT_READ|PROT_WRITE, MAP_SHARED,
 	    		devmem, JUMPER_PAGE);
 
+	//XXX check this inline
 	man_status = (*jump & 0x10);
 	h_status = (*jump6 & 0x1);
+	
 	printf("initializing sensors...\n");
 	Sensors(0, &status, &calib);
 	local_control.function = 0x0080;
@@ -124,6 +126,7 @@ int main()
 	printf("initializing interface/arbitration...\n");
 	Arbitor(&status, &local_control);
 
+	//XXX h/w manual mode
 	if (man_status == 0) {
 		local_control.function = 0x0;
 		printf("Entering Manual Test Mode\n\nto view sensor information ");
@@ -170,6 +173,7 @@ int main()
 		}
 	}
 		
+	//XXX h/w auto mode
 	/*configuration prompt*/
 	if (h_status == 1 ) {
 		/*master*/
@@ -289,28 +293,18 @@ void Configuration(void)
 
 	//FIXME disable previous noncanonical?
 
-	fp = fopen(CONFIG_NAM, "w");
+	fp = fopen(CONFIG_NAM, "r+");
 	if (fp < 0) {
 		printf("\nfopen failed\n");
 	}
 	setvbuf(fp, NULL, _IONBF, BUFSIZ);
 
-	/*address*/
-	printf("\nthe address must be three numeric digits and must not ex");
-	printf("ceed 255\nplease enter a three digit number:   ");
-	do {
-		t = 0;
-		while (getline(&line, &len, stdin) != 4)
-			printf("\ntry again - 3 digits, press enter!  ");
-		for (i=(int)line;i<((int)line+3);i++) {
-			if((isdigit((int)(*(line + t)))) == 0) {
-				t++;
-				printf("\nonly use digits  ");
-			}
-		}
-	} while (t != 0);
-	printf("\naddress is: %.3s", line);
-	fprintf(fp, "%.3s\n", line);
+	/* Address																  *
+	 * We will no longer edit the address from here, it will be done manually *
+	 * by editing the config file											  */
+
+	/*jump past first line in the file*/ 
+	fgets(line, 25, fp);	
 	
 	/*Pressure Transducer*/
 	/*offset*/
