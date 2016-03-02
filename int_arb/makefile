@@ -5,7 +5,7 @@
 #Make rules
 int_arb : intarb.o elections.o slave.o master.o candriver.o ui.o
 
-intarb.h : include/intarb.h /home/joel/mms_source/dbes/include/control_str.h
+intarb.h : include/intarb.h ../include/control_str.h
 
 intarb.o : intarb.c
 			$(CC) -c intarb.c $(CFLAGS) $(EXTRAFLAGS)

@@ -57,6 +57,8 @@ char local_id = 0;
 
 int Manual(void)
 {
+	time_t updatetv;
+	int detent, diff_flag;
 	//local_control.function = 0x0;
 	//local_control.rate = 255;
 	//Sensors(1, &status, &calib);
