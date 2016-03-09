@@ -92,4 +92,5 @@ extern int devmem;
 extern int h_status;
 
 /*local jack address*/
+//XXX remove this as global
 extern char local_id;

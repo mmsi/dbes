@@ -55,7 +55,7 @@
 int kbhit();
 void Nonblock(int);
 
-int UI(int mode)
+int UI(int mode, struct cnt_template_t *control, struct status_t *status_table)
 {
 	char c;
 	int i;
@@ -94,8 +94,8 @@ int UI(int mode)
 		for (i = 0; i == active; i++) {
 			total_weight = (total_weight + (status_table[i].pressure * CYL_AREA));
 		}
-		printf("\n\n Total Weight: %5.1f\t\tLift Rate: %u", total_weight, control.rate);
-		printf(" raw\tDestination:%5.2f inches", ((float)control.dest)/100);
+		printf("\n\n Total Weight: %5.1f\t\tLift Rate: %u", total_weight, control->rate);
+		printf(" raw\tDestination:%5.2f inches", ((float)control->dest)/100);
 		time(&updatetv);
 		updated = 1;
 	} else
@@ -103,7 +103,7 @@ int UI(int mode)
 
 	/*--Manual control--
 	 *perform jack zeroing if needed*/
-	if ((control.function & 0x8) == 0x8) {
+	if ((control->function & 0x8) == 0x8) {
 		if (updated == 1) {
 			printf("\n\n\n------MANUAL CONTROL------\n");
 			printf("\nsetting zero postion:\n");
@@ -123,6 +123,7 @@ int UI(int mode)
 							c = getchar();
 							if (c == 'y') {
 								Nonblock(NB_ENABLE);
+								//XXX
 								ui.function |= 0x20;
 								return 0;
 							} else if (c == 'n') {

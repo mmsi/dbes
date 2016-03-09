@@ -24,9 +24,8 @@
 #include"../include/control_str.h"
 #include"include/intarb.h"
 #include"include/candriver.h"
-#include"../include/unique.h"
 
-int Slave(struct cnt_template_t *local)
+int Slave(struct cnt_template_t *control, struct status_t *local_status)
 {
 	int ret;
 	unsigned char s_message_array[MSG_LENGTH];
@@ -40,15 +39,15 @@ int Slave(struct cnt_template_t *local)
 			return -1;
 		switch (s_msg_id) {
 			case CONTROL:
-				control.function = s_message_array[0];
-				control.id = s_message_array[1];
-				control.dest = s_message_array[3];
-				control.dest = ((control.dest << 8) + s_message_array[2]);
-				control.rate = s_message_array[4];
+				control->function = s_message_array[0];
+				//control->id = s_message_array[1];
+				control->dest = s_message_array[3];
+				control->dest = ((control->dest << 8) + s_message_array[2]);
+				control->rate = s_message_array[4];
 				break;
 
 			case ZERO:
-				control.function |= 0x20;
+				control->function |= 0x20;
 				break;
 		}
 	} while (s_msg_id != 0);
