@@ -40,3 +40,7 @@ extern int ui_flag; //depracated
 
 /*Int/Arb initialization*/
 extern int ini_flag; //FIXME why is this extern?
+
+/*jack addressing*/
+extern int active;
+extern int jack_lookup_table[];
