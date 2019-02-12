@@ -31,7 +31,6 @@
 #include"../include/control_str.h"
 #include"include/intarb.h"
 #include"include/candriver.h"
-#include"../include/unique.h"
 
 #define PING_WAIT 2
 
@@ -43,7 +42,7 @@ unsigned long e_msg_id;
 char active_table[];
 int master_flag;
 
-/*return: 0=error, 1=slave, 2=master*/
+
 int Elections()
 {
 	int ret;
@@ -53,6 +52,7 @@ int Elections()
 
 	return 0;
 }
+
 
 int JackDatabase()
 {
@@ -91,6 +91,7 @@ int JackDatabase()
 	} while(e_message_array[0] != 0);
 	return 0;
 }
+
 
 int Broadcast(void)
 {

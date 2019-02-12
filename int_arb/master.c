@@ -33,13 +33,10 @@
 unsigned char m_message_array[MSG_LENGTH];
 unsigned long m_msg_id;
 
-int Master(struct cnt_template_t *local)
+int Master(struct cnt_template_t *control, struct status_t *status_table)
 {
 	int ret=0, i=0, ii=0;
 	static int cnt_update;
-	
-	struct cnt_template_t m_ui;
-
 	
 
 	/*local ui retrieval*/
@@ -57,22 +54,22 @@ int Master(struct cnt_template_t *local)
 	} while (m_msg_id != 0);*/
 
 	/* System Zeroing */
-	if ((control.function & 0x20) == 0x20) {
+	if ((control->function & 0x20) == 0x20) {
 		m_msg_id = ZERO;
 		if (Driver(CAN_TX, m_message_array, &m_msg_id) < 0)
 			return -1;
-		ui.function &= ~0x20;
 		return 0;
 	}
 	
 	/* Broadcast control message */
+	//FIXME make this update based on time rather than iterations
 	if (cnt_update > UPDATE) {
 		m_msg_id = CONTROL;
-		m_message_array[0] = control.function;
-		m_message_array[1] = control.id;
-		m_message_array[2] = (unsigned char)control.dest;
-		m_message_array[3] = (unsigned char)(control.dest >> 8);
-		m_message_array[4] = control.rate;
+		m_message_array[0] = control->function;
+		m_message_array[1] = control->id;
+		m_message_array[2] = (unsigned char)control->dest;
+		m_message_array[3] = (unsigned char)(control->dest >> 8);
+		m_message_array[4] = control->rate;
 
 		ret = Driver(CAN_TX, m_message_array, &m_msg_id);
 		if (ret < 0)

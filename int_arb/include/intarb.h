@@ -33,18 +33,7 @@
 /*ui return*/
 #define UI_ZERO			2
 
-/*external control information*/
-extern struct cnt_template_t control;
 
-/*external ui structure*/
-extern struct cnt_template_t ui;
-
-/*external status information array*/
-extern struct status_t status_table[];
-
-/*jack addressing*/
-extern int active;
-extern int jack_lookup_table[];
 
 /*local ui 1=local, 0=remote*/
 extern int ui_flag; //depracated
@@ -52,3 +41,6 @@ extern int ui_flag; //depracated
 /*Int/Arb initialization*/
 extern int ini_flag; //FIXME why is this extern?
 
+/*jack addressing*/
+extern int active;
+extern int jack_lookup_table[];

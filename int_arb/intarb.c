@@ -36,16 +36,24 @@
 #define MAX_ADDRESSABLE 255
 
 /*declarations*/
-struct cnt_template_t control;
-struct cnt_template_t ui;
-struct status_t status_table[MAX_ADDRESSABLE];
-int active;
-int jack_lookup_table[MAX_ADDRESSABLE];
 int ui_flag;
 int ini_flag = 0;
 
 int Arbitor(struct status_t *local_status, struct cnt_template_t *local)
 {
+	/*external control information*/
+	static struct cnt_template_t control;
+
+	/*external ui structure*/
+	static struct cnt_template_t ui;
+
+	/*external status information array*/
+	static struct status_t status_table[MAX_ADDRESSABLE];
+
+	/*jack addressing*/
+	static int active;
+	static int jack_lookup_table[MAX_ADDRESSABLE];
+	
 	int ret, i;
 	char line[25];
 	FILE *fp;
@@ -62,30 +70,25 @@ int Arbitor(struct status_t *local_status, struct cnt_template_t *local)
 	/*push local jack status to array*/
 	status_table[0] = *local_status;
 	
-	/*master*/
+	/** Master **/
 	if (h_status == 1) {
 		//printf("master: int/arb\n");
 		//control.dest = (local_status->elevation - local_status->offset);
 		control.rate = 255; //adopt full rate for now
 		if ((local->function & 0x6) > 0)
-			UI(LOC_ACTIVE);
+			UI(LOC_ACTIVE, &ui, status_table);
 		else
-			UI(LOC_STOP);
-		ret = Master(local);
+			UI(LOC_STOP, &ui, status_table);
+		ret = Master(&control, status_table);
 		
-	/*slave*/
+	/** Slave **/
 	} else if (h_status == 0) {
 		//printf("slave: int/arb\n");
-		ret = Slave(local);
+		ret = Slave(&control, local_status);
 		if (ret < 0) {
 			printf("slave/CAN Error");
 		}
-		//printf("local function = %i\n", local->function);
-		//printf("control function = %i\n", control.function);
-		
-		//if ((local->function & 0x8) == 0x8) {
-		//	printf("manual mode\n");
-		//}
+	
 	} else {
 		printf("h_status variable out of bounds, please panic.");
 		return 0; //FIXME returning normal, should this condition cause cont?
@@ -96,6 +99,8 @@ int Arbitor(struct status_t *local_status, struct cnt_template_t *local)
 	/* Local System Zeroing */
 	if ((control.function & 0x20) == 0x20) {
 		local_status->offset = local_status->elevation;
+		/* clear zeroing flags */
+		ui.function &= ~0x20;
 		control.function &= ~0x20;
 		printf("System Zeroed...\nzero set at: %i\n", local_status->offset);
 
