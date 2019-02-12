@@ -305,8 +305,9 @@ void Configuration(void)
 	 * We will no longer edit the address from here, it will be done manually *
 	 * by editing the config file											  */
 
-	/*jump past first line in the file*/ 
-	fgets(line, 25, fp);	
+	//FIXME
+	/*add bogus address*/ 
+	fprintf(fp, "100\n");	
 	
 	/*Pressure Transducer*/
 	/*offset*/
@@ -354,6 +355,9 @@ void Configuration(void)
 	raw_d = ((((double)Sensor_cal(POS)) - ((double)raw)) / strtod(line, NULL));
 	fprintf(fp, "%4.3f\n", raw_d);
 
+	/*empty zero offset*/
+	fprintf(fp, "0\n");
+
 	local_control.function = 0x4;
 	local_control.rate = 0xFF;
 	Hyd_Control(local_control);
@@ -374,6 +378,7 @@ int LoadCalib(struct calib_t *calib)
 		//FIXME perror?
 	}
 	for (i=0; i<6; i++) {
+		//XXX check for EOF
 		if (fgets(line, 25, fp) == NULL)
 			return -1;
 		switch (i) {
