@@ -47,7 +47,7 @@ EXTRAFLAGS := $(configs-y)
 export EXTRAFLAGS
 
 #Build settings
-CFLAGS                  = -I$ include -mcpu=arm9 -Wall -g
+CFLAGS                  = -I./include -I./int_arb/include -mcpu=arm9 -Wall -g
 export CFLAGS
 export srcdir
 

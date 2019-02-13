@@ -42,8 +42,8 @@ int Master(struct cnt_template_t *control, struct status_t *status_table)
 	/*local ui retrieval*/
 	/*limit this to .function and .dest for now. Different master routines
 	 *will modify the other structure members*/
-	control.function = ui.function;
-	control.dest = ui.dest;
+	control->function = ui.function;
+	control->dest = ui.dest;
 
 
 

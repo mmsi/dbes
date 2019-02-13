@@ -38,6 +38,11 @@
 /*declarations*/
 int ui_flag;
 int ini_flag = 0;
+/* XXX added back in for breakage */
+struct cnt_template_t ui;
+int active;
+int jack_lookup_table[MAX_ADDRESSABLE];
+
 
 int Arbitor(struct status_t *local_status, struct cnt_template_t *local)
 {
@@ -51,8 +56,8 @@ int Arbitor(struct status_t *local_status, struct cnt_template_t *local)
 	static struct status_t status_table[MAX_ADDRESSABLE];
 
 	/*jack addressing*/
-	static int active;
-	static int jack_lookup_table[MAX_ADDRESSABLE];
+	//static int active;
+	//static int jack_lookup_table[MAX_ADDRESSABLE];
 	
 	int ret, i;
 	char line[25];

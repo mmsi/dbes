@@ -152,7 +152,7 @@ int UI(int mode, struct cnt_template_t *control, struct status_t *status_table)
 			printf(" Lowering mode active\n\n");
 		else
 			printf(" Lifting mode active\n\n");
-		switch (control.function & 0x6) {
+		switch (control->function & 0x6) {
 			case 0x0:
 				printf(" Status: ...holding load\n");
 				break;
@@ -178,7 +178,7 @@ int UI(int mode, struct cnt_template_t *control, struct status_t *status_table)
 	if (kbhit() != 0) {
 		switch (getchar()) {
 			case SPACE:
-				switch (control.function & 0x6) {
+				switch (control->function & 0x6) {
 					case 0x0:
 						if (lift_flag == LIFT)
 							ui.function |= 0x2;
@@ -199,10 +199,10 @@ int UI(int mode, struct cnt_template_t *control, struct status_t *status_table)
 
 			case 'd': //change direction
 				lift_flag = ((~lift_flag) & 0x1);
-				if ((control.function & 0x6)== 0x2) {
+				if ((control->function & 0x6)== 0x2) {
 					ui.function = 0x4;
 					lift_flag = LOWER;
-				} else if ((control.function & 0x6) == 0x4) {
+				} else if ((control->function & 0x6) == 0x4) {
 					ui.function = 0x2;
 					lift_flag = LIFT;
 				} else 
