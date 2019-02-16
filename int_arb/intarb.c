@@ -63,6 +63,7 @@ int Arbitor(struct status_t *local_status, struct cnt_template_t *local)
 	char line[25];
 	FILE *fp;
 
+	// FIXME make the 0x80 a defined const
 	if ((local->function & 0x80) == 0x80) {
 		printf("Elections\n");
 		Elections();
@@ -72,7 +73,7 @@ int Arbitor(struct status_t *local_status, struct cnt_template_t *local)
 	
 	/*normal int/arb operations*/
 
-	/*push local jack status to array*/
+	/*push local jack status to status array*/
 	status_table[0] = *local_status;
 	
 	/** Master **/
@@ -80,6 +81,7 @@ int Arbitor(struct status_t *local_status, struct cnt_template_t *local)
 		//printf("master: int/arb\n");
 		//control.dest = (local_status->elevation - local_status->offset);
 		control.rate = 255; //adopt full rate for now
+		// FIXME another function hex needs to be a constant
 		if ((local->function & 0x6) > 0)
 			UI(LOC_ACTIVE, &ui, status_table);
 		else
