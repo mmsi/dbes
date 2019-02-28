@@ -21,9 +21,14 @@
  */
 
 #define _GNU_SOURCE
+#include<unistd.h>
+#include<time.h>
 #include"../include/control_str.h"
 #include"include/intarb.h"
 #include"include/candriver.h"
+
+/* ID mapping delay (seconds) */
+#define UPDATE 180
 
 int Slave(struct cnt_template_t *control, struct status_t *local_status)
 {
@@ -31,6 +36,12 @@ int Slave(struct cnt_template_t *control, struct status_t *local_status)
 	unsigned char s_message_array[MSG_LENGTH];
 	unsigned long s_msg_id;
 
+	/* ID mapping delays */
+	static int mapped = 0;
+	static time_t updatetv;
+
+	if ((difftime(time(NULL),updatetv))>UPDATE)
+		mapped = 0;
 	
 	/*normal slave operations*/
 	do {
@@ -48,6 +59,22 @@ int Slave(struct cnt_template_t *control, struct status_t *local_status)
 
 			case ZERO:
 				control->function |= 0x20;
+				break;
+
+			case ID_PING:
+				if (mapped == 0) {
+					s_message_array[0] = local_id; //XXX does id have scope here?
+					s_msg_id = PING_REPLY;
+					Driver(CAN_TX, &e_message_array[0], &s_msg_id);
+					usleep(100);
+					ret = Driver(CAN_RX, s_message_array, &s_msg_id);
+					if (ret != 0)
+						return -1;
+					if ((s_msg_id == ACK_ID)&&(s_message_array[0]==local_id)) {
+						mapped = 1;
+						time(&updatetv);
+					}
+				}
 				break;
 		}
 	} while (s_msg_id != 0);

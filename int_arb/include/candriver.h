@@ -40,14 +40,14 @@
 #define MSG_LENGTH	8
 
 /*message id*/
-#define MASTER_PING			10  //no data
+#define ID_PING				10  //no data
 #define CONTROL				1	   //5 bytes
 #define BROAD_ID			2	   //byte 0
 #define CONT				3		   //no data
 #define STATUS_REQ			4   //byte 0
 #define STATUS				5	   //6 bytes - note exception
 #define UIPASS				6	   //5 bytes
-#define PING_REPLY			7   //no data
+#define PING_REPLY			7   //1 byte - address
 #define CONT_RECOV			8   //no data
 #define ZERO				9
 #define ACK_ID				11	//1 byte - address

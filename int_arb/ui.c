@@ -142,12 +142,13 @@ int UI(int mode, struct cnt_template_t *control, struct status_t *status_table)
 	if (updated == 1) {
 		printf("\n\n\n_Key Commands________________________________\n");
 		printf("| START/STOP ------------------ spacebar\n");
-		printf("| change direction ------------ d\n");
+		printf("| change [D]irection ------------ d\n");
 		printf("| adjust destination (.01) ---- q: up    a: down\n");
 		printf("| adjust destination (.1) ----- w: up    s: down\n");
-		printf("| reset destination ----------- r\n");
-		printf("| adjust lift rate ------------ l <rate> enter\n");
-		printf("| enter manual control -------- m\n\n");
+		printf("| [R]eset destination ----------- r\n");
+		printf("| adjust [L]ift rate ------------ l <rate> enter\n");
+		printf("| enter [M]anual control -------- m\n");
+		printf("| setup jack layo[U]t ----------- u\n\n");
 		if (lift_flag == LOWER)
 			printf(" Lowering mode active\n\n");
 		else
@@ -234,7 +235,12 @@ int UI(int mode, struct cnt_template_t *control, struct status_t *status_table)
 			case 'r': //reset destination to 0
 				ui.dest = 0;
 				break;
-	
+
+			case 'u': //setup physical jack mapping
+				iu.function = 0x40;
+				Nonblock(NB_DISABLE);
+				block_status = 0;
+				break;
 		}
 	}
 	return 0;

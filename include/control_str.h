@@ -34,7 +34,7 @@
  *		bit 3			       	control flag - 0: auto, 1: manual
  *      bit 4                	contingency recovery
  * 		bit 5					zeroing flag
- *		bit 6		   			undefined
+ *		bit 6		   			mapping flag
  *		bit 7			       	init flag
  *unsigned char	id		   		jack id
  *short dest					destination height
