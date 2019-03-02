@@ -237,7 +237,7 @@ int UI(int mode, struct cnt_template_t *control, struct status_t *status_table)
 				break;
 
 			case 'u': //setup physical jack mapping
-				iu.function = 0x40;
+				ui.function = 0x40;
 				Nonblock(NB_DISABLE);
 				block_status = 0;
 				break;

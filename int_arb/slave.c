@@ -65,7 +65,7 @@ int Slave(struct cnt_template_t *control, struct status_t *local_status)
 				if (mapped == 0) {
 					s_message_array[0] = local_id; //XXX does id have scope here?
 					s_msg_id = PING_REPLY;
-					Driver(CAN_TX, &e_message_array[0], &s_msg_id);
+					Driver(CAN_TX, &s_message_array[0], &s_msg_id);
 					usleep(100);
 					ret = Driver(CAN_RX, s_message_array, &s_msg_id);
 					if (ret != 0)
