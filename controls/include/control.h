@@ -31,4 +31,5 @@
 #define LIFT 1	  //DIO_0 proportional valve select. off=lower, on=lift
 #define CHECK 2	  //DIO_1 cylinder check valve
 #define MASTER 4  //DIO_2 master control valve
-#define AUX_PWM 8   //DIO_3 contingency light
+#define AUX_PWM 8   //DIO_3 temporary lift/lower signal until pwm is complete
+#define SAFE 16    //DIO_4 safe signal
