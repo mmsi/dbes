@@ -29,15 +29,15 @@
 /**
  *cnt_template_t
  *unsigned char function		address and/or other information
- *		bit 0			       	contingency flag
- *		bits 1,2		   		lift - 00: idle, 01: lift, 10: lower
- *		bit 3			       	control flag - 0: auto, 1: manual
- *      bit 4                	contingency recovery
- * 		bit 5					zeroing flag
- *		bit 6		   			mapping flag
- *		bit 7			       	init flag
- *unsigned char	id		   		jack id
- *short dest					destination height
+ *		bit 0			contingency flag
+ *		bits 1,2		lift - 00: idle, 01: lift, 10: lower
+ *		bit 3			control flag - 0: auto, 1: manual
+ *      	bit 4                	contingency recovery
+ * 		bit 5			zeroing flag
+ *		bit 6		   	mapping flag
+ *		bit 7			init flag
+ *unsigned char	id		   	jack id
+ *short dest				destination height
  *unsigned char rate			lifting rate - raw linear 0-255
  */
 
@@ -54,9 +54,9 @@ struct cnt_template_t {
  *short elevation				elevation
  *short offset					elevation zero offset
  *unsigned short pressure		pressure transducer
- *unsigned char d_input			button and limit switches
+ *unsigned char d_input			button and limit switches digital inputs
  *		bit 0			down button
- *		bit 1			n/a
+ *		bit 1			fault signal relay (CR6)
  *		bit 2			n/a
  *		bit 3			up button
  *		bit 4			tilt interlock switch
@@ -82,7 +82,8 @@ struct calib_t {
 };
 
 #define	DOWN	0x1
-#define	UP		0x8
+#define	UP	0x8
+#define FAULT	0x2
 #define INTERL	0x10
 
 /*global file descriptor for mmap to use*/
