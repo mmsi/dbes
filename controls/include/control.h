@@ -28,8 +28,8 @@
 
 /*pin assignments*/
 /*powers of 2 for bitwise manipulation*/
-#define LIFT 1	  //DIO_0 proportional valve select. off=lower, on=lift
-#define CHECK 2	  //DIO_1 cylinder check valve
-#define MASTER 4  //DIO_2 master control valve
-#define AUX_PWM 8   //DIO_3 temporary lift/lower signal until pwm is complete
-#define SAFE 16    //DIO_4 safe signal
+#define LIFT 1	  //DIO_0 proportional valve select. off=lower, on=lift (CR1)
+#define CHECK 2	  //DIO_1 cylinder check valve (CR2)
+#define MASTER 4  //DIO_2 master control valve (CR3)
+#define AUX_PWM 8   //DIO_3 temporary lift/lower signal until pwm is complete (CR4)
+#define SAFE 16    //DIO_4 safe signal (CR5)
