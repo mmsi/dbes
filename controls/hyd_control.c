@@ -31,6 +31,7 @@ int Hyd_Control(struct cnt_template_t control)
 	if ((control.function & 0x0080) == 0x80) {
 		Dout(0, 0);
 		PWM(0, 0);
+		Dout(SAFE, ON);
 		return 0;
 	}
 	
