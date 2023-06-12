@@ -50,7 +50,7 @@ int Arbitor(struct status_t *local_status, struct cnt_template_t *local)
 	static struct cnt_template_t control;
 
 	/*external ui structure*/
-	static struct cnt_template_t ui;
+	//static struct cnt_template_t ui;
 
 	/*external status information array*/
 	static struct status_t status_table[MAX_ADDRESSABLE];
