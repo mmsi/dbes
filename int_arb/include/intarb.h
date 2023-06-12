@@ -37,7 +37,7 @@
 /*external ui structure
  * added back in on account of breakage */
 /* XXX looks like I was trying move this definition to another place */
-extern static struct cnt_template_t ui;
+extern struct cnt_template_t ui;
 
 /*external control information*/
 /*XXX this had been moved as well*/
