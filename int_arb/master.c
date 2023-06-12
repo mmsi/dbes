@@ -86,6 +86,7 @@ int Master(struct cnt_template_t *control, struct status_t *status_table)
 	return;
 }*/
 
+/*
 int StatusScheduler()
 {
 	static int i;
@@ -107,3 +108,4 @@ int StatusScheduler()
 	}
 	return 0;
 }
+*/
